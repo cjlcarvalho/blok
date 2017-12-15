@@ -13,6 +13,6 @@ public:
     virtual void createGround(QGraphicsScene*) = 0;
 };
 
-Q_DECLARE_INTERFACE(IGroundImage, "org.qt-project.blok-images.IGroundImage/1.0")
+Q_DECLARE_INTERFACE(IGroundImage, "org.qt-project.blok-images.IGroundImage")
 
 #endif // IGROUNDIMAGE_H

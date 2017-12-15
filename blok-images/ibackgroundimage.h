@@ -13,6 +13,6 @@ public:
     virtual void createBackground(QGraphicsScene*) = 0;
 };
 
-Q_DECLARE_INTERFACE(IBackgroundImage, "org.qt-project.blok-images.IBackgroundImage/1.0")
+Q_DECLARE_INTERFACE(IBackgroundImage, "org.qt-project.blok-images.IBackgroundImage")
 
 #endif // IBACKGROUNDIMAGE_H

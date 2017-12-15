@@ -14,6 +14,6 @@ public:
     virtual QGraphicsRectItem* createPlayer(QGraphicsScene*) = 0;
 };
 
-Q_DECLARE_INTERFACE(IPlayerImage, "org.qt-project.blok-images.IPlayerImage/1.0")
+Q_DECLARE_INTERFACE(IPlayerImage, "org.qt-project.blok-images.IPlayerImage")
 
 #endif // IPLAYERIMAGE_H

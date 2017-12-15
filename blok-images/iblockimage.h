@@ -14,6 +14,6 @@ public:
     virtual QGraphicsRectItem* createBlock(QGraphicsScene*) = 0;
 };
 
-Q_DECLARE_INTERFACE(IBlockImage, "org.qt-project.blok-images.IBlockImage/1.0")
+Q_DECLARE_INTERFACE(IBlockImage, "org.qt-project.blok-images.IBlockImage")
 
 #endif // IBLOCKIMAGE_H

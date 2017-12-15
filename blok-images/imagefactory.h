@@ -18,6 +18,6 @@ public:
     virtual IBlockImage* createBlockImage() = 0;
 };
 
-Q_DECLARE_INTERFACE(ImageFactory, "org.qt-project.blok-images.ImageFactory/1.0")
+Q_DECLARE_INTERFACE(ImageFactory, "org.qt-project.blok-images.ImageFactory")
 
 #endif // BLOKIMAGES_H
