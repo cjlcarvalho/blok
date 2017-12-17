@@ -4,11 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
 QT       += core widgets
 
 TARGET = blok-images
-TEMPLATE = lib
+TEMPLATE = lib static
 
 DEFINES += BLOKIMAGES_LIBRARY
 

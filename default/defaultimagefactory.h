@@ -1,21 +1,21 @@
-#ifndef SNOWIMAGEFACTORY_H
-#define SNOWIMAGEFACTORY_H
+#ifndef DEFAULTIMAGEFACTORY_H
+#define DEFAULTIMAGEFACTORY_H
 
 #include <QObject>
 #include <QtPlugin>
-#include "snow_global.h"
+#include "default_global.h"
 #include "../blok-images/imagefactory.h"
 
-class SNOWSHARED_EXPORT SnowImageFactory : public ImageFactory
+class DEFAULTSHARED_EXPORT DefaultImageFactory : public ImageFactory
 {
     Q_OBJECT
     Q_INTERFACES(ImageFactory)
 public:
-    SnowImageFactory();
+    DefaultImageFactory();
     virtual IBackgroundImage* createBackgroundImage();
     virtual IGroundImage* createGroundImage();
     virtual IPlayerImage* createPlayerImage();
     virtual IBlockImage* createBlockImage();
 };
 
-#endif // SNOWIMAGEFACTORY_H
+#endif // DEFAULTIMAGEFACTORY_H

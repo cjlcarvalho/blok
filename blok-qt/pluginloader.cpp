@@ -1,26 +1,34 @@
 #include <QCoreApplication>
+#include <QDebug>
 #include <QDir>
 #include <QPluginLoader>
 #include "pluginloader.h"
 
 PluginLoader::PluginLoader()
 {
-    QObject* imagePlugin = _retrievePlugin(QCoreApplication::applicationDirPath() + "/plugins/", "imagefactory.h");
+    QObject* imagePlugin = _retrieveImagePlugin();
     if(imagePlugin)
-        _imageFactory = dynamic_cast<ImageFactory*>(imagePlugin);
+        _imageFactory = qobject_cast<ImageFactory*>(imagePlugin);
 }
 
-QObject* PluginLoader::_retrievePlugin(const QString &path, const QString &interfaceName){
-    QDir pluginPath(path);
-    if(!pluginPath.exists() || path.isEmpty())
-        return nullptr;
-    QFileInfoList itemList = pluginPath.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::DirsFirst);
-    foreach (const QFileInfo& folder, itemList) {
-        QString fileName = folder.fileName() + interfaceName;
-        QPluginLoader loader(folder.filePath() + "/" + fileName);
-        QObject* instance = loader.instance();
-        if(instance)
-            return instance;
+QObject* PluginLoader::_retrieveImagePlugin(){
+    QDir pluginsDir = QDir(QCoreApplication::applicationDirPath());
+#if defined(Q_OS_WIN)
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    if (pluginsDir.dirName() == "MacOS") {
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+    }
+#endif
+    pluginsDir.cdUp();
+    pluginsDir.cd("image_plugins/");
+    foreach(QString file, pluginsDir.entryList(QDir::Files)){
+        qDebug() << "Arquivo: " << pluginsDir.absoluteFilePath(file);
+        QPluginLoader loader(pluginsDir.absoluteFilePath(file));
+        return loader.instance();
     }
     return nullptr;
 }

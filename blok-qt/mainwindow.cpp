@@ -117,8 +117,8 @@ void MainWindow::init()
     _scene->setSceneRect(-450, -250, 900, 500);
 
     // Background
-    // _imageFactory->createBackgroundImage()->createBackground(_scene);
-    _scene->addPixmap(QPixmap (":/resources/images/background.png"))->setPos(-500, -300);
+    _imageFactory->createBackgroundImage()->createBackground(_scene);
+    qDebug() << "criou background";
 
     // Banner
     _banner = _scene->addRect(-250, -50, 500, 100);
@@ -134,11 +134,8 @@ void MainWindow::init()
     text2->setPos(-text2->boundingRect().width()/2, text2->boundingRect().height());
 
     // Ground
-    QGraphicsRectItem *ground = _scene->addRect(-450, -10, 900, 20);
-    ground->setPos(0, 260);
-    QBrush brush(QPixmap(":/resources/images/ground.png"));
-    brush.setTransform(brush.transform().translate(-450, -10));
-    ground->setBrush(brush);
+    _imageFactory->createGroundImage()->createGround(_scene);
+    qDebug() << "criou ground";
 }
 
 void MainWindow::bannerEnter()
@@ -222,20 +219,14 @@ void MainWindow::bodiesCreated(const QList<b2Body *> &bodies)
         if (body->GetUserData())
         {
             // Player
-            rect = _scene->addRect(-28, -28, 56, 56);
-            QPixmap pixmap(QString(":/resources/images/player%1.png").arg(qrand()%9));
-            QBrush brush(pixmap);
-            brush.setTransform(brush.transform().translate(-28, -28));
-            rect->setBrush(brush);
-            _player = rect;
+            rect = _imageFactory->createPlayerImage()->createPlayer(_scene);
+            qDebug() << "criou player";
         }
         else
         {
             // Block
-            rect = _scene->addRect(-14, -14, 28, 28);
-            QBrush brush(QPixmap(":/resources/images/brick.png"));
-            brush.setTransform(brush.transform().translate(-14, -14));
-            rect->setBrush(brush);
+            rect = _imageFactory->createBlockImage()->createBlock(_scene);
+            qDebug() << "criou block";
         }
         rect->setPos(position.x, -position.y);
         rect->setPen(QPen(Qt::NoPen));

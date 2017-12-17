@@ -2,12 +2,11 @@
 #define IPLAYERIMAGE_H
 
 #include <QtPlugin>
+#include <QGraphicsRectItem>
+#include <QGraphicsScene>
 #include "blok-images_global.h"
 
-class QGraphicsRectItem;
-class QGraphicsScene;
-
-class BLOKIMAGESSHARED_EXPORT IPlayerImage
+class BLOKIMAGESSHARED_EXPORT IPlayerImage : public QObject
 {
 public:
     IPlayerImage();

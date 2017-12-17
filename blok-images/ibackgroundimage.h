@@ -2,14 +2,13 @@
 #define IBACKGROUNDIMAGE_H
 
 #include <QtPlugin>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
 #include "blok-images_global.h"
 
-class QGraphicsScene;
-
-class BLOKIMAGESSHARED_EXPORT IBackgroundImage
+class BLOKIMAGESSHARED_EXPORT IBackgroundImage : public QObject
 {
 public:
-    IBackgroundImage();
     virtual void createBackground(QGraphicsScene*) = 0;
 };
 

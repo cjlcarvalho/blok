@@ -8,10 +8,9 @@
 #include "iplayerimage.h"
 #include "iblockimage.h"
 
-class BLOKIMAGESSHARED_EXPORT ImageFactory
+class BLOKIMAGESSHARED_EXPORT ImageFactory : public QObject
 {
 public:
-    ImageFactory();
     virtual IBackgroundImage* createBackgroundImage() = 0;
     virtual IGroundImage* createGroundImage() = 0;
     virtual IPlayerImage* createPlayerImage() = 0;

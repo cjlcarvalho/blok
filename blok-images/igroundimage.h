@@ -2,11 +2,12 @@
 #define IGROUNDIMAGE_H
 
 #include <QtPlugin>
+#include <QGraphicsScene>
 #include "blok-images_global.h"
 
 class QGraphicsScene;
 
-class BLOKIMAGESSHARED_EXPORT IGroundImage
+class BLOKIMAGESSHARED_EXPORT IGroundImage : public QObject
 {
 public:
     IGroundImage();

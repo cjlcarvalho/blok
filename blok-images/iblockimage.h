@@ -2,12 +2,14 @@
 #define IBLOCKIMAGE_H
 
 #include <QtPlugin>
+#include <QGraphicsRectItem>
+#include <QGraphicsScene>
 #include "blok-images_global.h"
 
 class QGraphicsRectItem;
 class QGraphicsScene;
 
-class BLOKIMAGESSHARED_EXPORT IBlockImage
+class BLOKIMAGESSHARED_EXPORT IBlockImage : public QObject
 {
 public:
     IBlockImage();

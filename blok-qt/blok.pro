@@ -21,5 +21,9 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-RESOURCES += \
-    blok.qrc
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug/release/ -lblok-images
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug/debug/ -lblok-images
+else:unix: LIBS += -L$$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug/ -lblok-images
+
+INCLUDEPATH += $$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug
+DEPENDPATH += $$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug

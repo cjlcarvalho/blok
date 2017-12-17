@@ -7,7 +7,7 @@ class PluginLoader
 {
 private:
     ImageFactory* _imageFactory;
-    QObject* _retrievePlugin(const QString&, const QString&);
+    QObject* _retrieveImagePlugin();
 public:
     PluginLoader();
     ImageFactory* getImageFactory();

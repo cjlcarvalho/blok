@@ -1,30 +1,30 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-12-15T18:36:22
+# Project created by QtCreator 2017-12-17T20:00:36
 #
 #-------------------------------------------------
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += gui core widgets
 
-TARGET = snow
+TARGET = default_
 TEMPLATE = lib
 CONFIG += plugin
 
-DEFINES += SNOW_LIBRARY
+DEFINES += DEFAULT_LIBRARY
 DESTDIR = ../image_plugins
 
-SOURCES += snowimagefactory.cpp \
-    snowbackgroundimage.cpp \
-    snowgroundimage.cpp \
-    snowblockimage.cpp \
-    snowplayerimage.cpp
+SOURCES += defaultimagefactory.cpp \
+    defaultbackgroundimage.cpp \
+    defaultblockimage.cpp \
+    defaultgroundimage.cpp \
+    defaultplayerimage.cpp
 
-HEADERS += snowimagefactory.h\
-        snow_global.h \
-    snowbackgroundimage.h \
-    snowgroundimage.h \
-    snowblockimage.h \
-    snowplayerimage.h
+HEADERS += defaultimagefactory.h\
+        default_global.h \
+    defaultbackgroundimage.h \
+    defaultblockimage.h \
+    defaultgroundimage.h \
+    defaultplayerimage.h
 
 unix {
     target.path = /usr/lib
@@ -39,4 +39,4 @@ INCLUDEPATH += $$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug
 DEPENDPATH += $$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug
 
 RESOURCES += \
-    snow.qrc
+    default.qrc
