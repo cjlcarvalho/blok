@@ -1,4 +1,8 @@
 #include "defaultimagefactory.h"
+#include "defaultbackgroundimage.h"
+#include "defaultgroundimage.h"
+#include "defaultplayerimage.h"
+#include "defaultblockimage.h"
 
 
 DefaultImageFactory::DefaultImageFactory()
@@ -6,19 +10,19 @@ DefaultImageFactory::DefaultImageFactory()
 }
 
 IBackgroundImage* DefaultImageFactory::createBackgroundImage(){
-    return nullptr;
+    return new DefaultBackgroundImage;
 }
 
 IGroundImage* DefaultImageFactory::createGroundImage(){
-    return nullptr;
+    return new DefaultGroundImage;
 }
 
 IPlayerImage* DefaultImageFactory::createPlayerImage(){
-    return nullptr;
+    return new DefaultPlayerImage;
 }
 
 IBlockImage* DefaultImageFactory::createBlockImage(){
-    return nullptr;
+    return new DefaultBlockImage;
 }
 
 Q_EXPORT_PLUGIN2(default_, DefaultImageFactory)
