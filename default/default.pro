@@ -11,7 +11,7 @@ TEMPLATE = lib
 CONFIG += plugin
 
 DEFINES += DEFAULT_LIBRARY
-DESTDIR = ../image_plugins
+DESTDIR = ../images_plugins
 
 SOURCES += defaultimagefactory.cpp \
     defaultbackgroundimage.cpp \

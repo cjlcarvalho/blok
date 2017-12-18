@@ -24,7 +24,7 @@ QObject* PluginLoader::_retrieveImagePlugin(){
     }
 #endif
     pluginsDir.cdUp();
-    pluginsDir.cd("image_plugins/");
+    pluginsDir.cd("images_plugins/");
     foreach(QString file, pluginsDir.entryList(QDir::Files)){
         qDebug() << "Arquivo: " << pluginsDir.absoluteFilePath(file);
         QPluginLoader loader(pluginsDir.absoluteFilePath(file));

@@ -11,7 +11,7 @@ TEMPLATE = lib
 CONFIG += plugin
 
 DEFINES += SNOW_LIBRARY
-DESTDIR = ../image_plugins
+DESTDIR = ../images_plugins
 
 SOURCES += snowimagefactory.cpp \
     snowbackgroundimage.cpp \
