@@ -220,6 +220,7 @@ void MainWindow::bodiesCreated(const QList<b2Body *> &bodies)
         {
             // Player
             rect = _imageFactory->createPlayerImage()->createPlayer(_scene);
+            _player = rect;
             qDebug() << "criou player";
         }
         else
