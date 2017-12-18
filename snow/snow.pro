@@ -31,12 +31,12 @@ unix {
     INSTALLS += target
 }
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug/release/ -lblok-images
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug/debug/ -lblok-images
-else:unix: LIBS += -L$$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug/ -lblok-images
-
-INCLUDEPATH += $$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug
-DEPENDPATH += $$PWD/../build-blok-images-Qt_4_8_7_in_PATH_qt4-Debug
-
 RESOURCES += \
     snow.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../images_lib/release/ -lblok-images
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../images_lib/debug/ -lblok-images
+else:unix: LIBS += -L$$PWD/../images_lib/ -lblok-images
+
+INCLUDEPATH += $$PWD/../images_lib
+DEPENDPATH += $$PWD/../images_lib
