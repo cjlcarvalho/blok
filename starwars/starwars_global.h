@@ -1,0 +1,12 @@
+#ifndef STARWARS_GLOBAL_H
+#define STARWARS_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(STARWARS_LIBRARY)
+#  define STARWARSSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define STARWARSSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // STARWARS_GLOBAL_H

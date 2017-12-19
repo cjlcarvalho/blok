@@ -118,7 +118,6 @@ void MainWindow::init()
 
     // Background
     _imageFactory->createBackgroundImage()->createBackground(_scene);
-    qDebug() << "criou background";
 
     // Banner
     _banner = _scene->addRect(-250, -50, 500, 100);
@@ -135,7 +134,6 @@ void MainWindow::init()
 
     // Ground
     _imageFactory->createGroundImage()->createGround(_scene);
-    qDebug() << "criou ground";
 }
 
 void MainWindow::bannerEnter()
@@ -221,13 +219,11 @@ void MainWindow::bodiesCreated(const QList<b2Body *> &bodies)
             // Player
             rect = _imageFactory->createPlayerImage()->createPlayer(_scene);
             _player = rect;
-            qDebug() << "criou player";
         }
         else
         {
             // Block
             rect = _imageFactory->createBlockImage()->createBlock(_scene);
-            qDebug() << "criou block";
         }
         rect->setPos(position.x, -position.y);
         rect->setPen(QPen(Qt::NoPen));

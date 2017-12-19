@@ -2,7 +2,7 @@
 
 setRootDir () {
     cwd="${PWD##*/}"
-    if [ $cwd != "blok" ]; then
+    if [[ $cwd != "blok" ]]; then
         cd ..
     fi
 }
@@ -12,6 +12,8 @@ clean () {
     cd blok-images
     make clean
     cd ../snow
+    make clean
+    cd ../starwars
     make clean
     cd ../default
     make clean
@@ -44,6 +46,13 @@ compileDefaultPlugin () {
     make -j 5
 }
 
+compileStarWarsPlugin () {
+    setRootDir
+    cd starwars
+    qmake-qt4
+    make -j 5
+}
+
 setLDLibraryPath () {
     if [[ $LD_LIBRARY_PATH != *"$PWD/images_lib"* ]]; then
         echo ""
@@ -69,6 +78,7 @@ compile () {
     echo "Select your image plugin:"
     echo "[1] - DEFAULT"
     echo "[2] - SNOW"
+    echo "[3] - STAR WARS"
     read -p "Option: " plugin
     if [[ $plugin == "1" ]]; then
         echo "Compiling Default plugin..."
@@ -76,11 +86,14 @@ compile () {
     elif [[ $plugin == "2" ]]; then
         echo "Compiling Snow plugin..."
         compileSnowPlugin
+    elif [[ $plugin == "3" ]]; then
+        echo "Compiling Star Wars plugin..."
+        compileStarWarsPlugin
     else
         echo "Wrong choice. Please try again."
-        exit
     fi
     compileBlokQt
+    echo ""
     read -p "Do you wish to run Blok? [Y/N] " yn
     case $yn in
         [Yy]* ) run;;
