@@ -91,6 +91,7 @@ compile () {
         compileStarWarsPlugin
     else
         echo "Wrong choice. Please try again."
+        exit
     fi
     compileBlokQt
     echo ""
