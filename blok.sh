@@ -118,11 +118,11 @@ main () {
     echo "###################"
     echo ""
 
-    if [ "$1" == "compile" ]; then
+    if [[ "$1" == "compile" ]]; then
         compile
-    elif [ "$1" == "run" ]; then
+    elif [[ "$1" == "run" ]]; then
         run
-    elif [ "$1" == "clean" ]; then
+    elif [[ "$1" == "clean" ]]; then
         echo "Cleaning directories..."
         clean
     else
