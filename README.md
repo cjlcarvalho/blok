@@ -1,6 +1,10 @@
 # blok
 
-- Before running on terminal:
+- Running:
+    
+    - Execute blok.sh script with compile/run/clean option
+
+- In case of problems:
 
     - Compile blok-images
 
