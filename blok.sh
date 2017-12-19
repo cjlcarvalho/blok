@@ -71,6 +71,25 @@ compileBlokQt () {
     make -j 5
 }
 
+changePlugin () {
+    setRootDir
+    cd images_plugins
+    rm -f *.so
+    if [[ $1 == "default" ]]; then
+	echo "Compiling Default image plugin..."
+        compileDefaultPlugin
+    elif [[ $1 == "snow" ]]; then
+	echo "Compiling Snow image plugin..."
+	compileSnowPlugin
+    elif [[ $1 == "starwars" ]]; then
+	echo "Compiling Star Wars image plugin..."
+	compileStarWarsPlugin
+    else
+	echo "Wrong choice. Please try again."
+	exit
+    fi
+}
+
 compile () {
     clean
     compileBlokImages
@@ -125,6 +144,8 @@ main () {
     elif [[ "$1" == "clean" ]]; then
         echo "Cleaning directories..."
         clean
+    elif [[ "$1" == "change" ]]; then
+	changePlugin $2
     else
         echo "Wrong parameter"
         echo "Usage: ./blok.sh [compile/run/clean]"
@@ -132,4 +153,4 @@ main () {
     fi
 }
 
-main $1
+main $1 $2
