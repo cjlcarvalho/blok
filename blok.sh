@@ -95,7 +95,7 @@ compile () {
     fi
     compileBlokQt
     echo ""
-    read -p "Do you wish to run Blok? [Y/N] " yn
+    read -p "Do you want to run Blok? [Y/N] " yn
     case $yn in
         [Yy]* ) run;;
         [Nn]* ) exit;;
