@@ -78,6 +78,7 @@ compile () {
         compileSnowPlugin
     else
         echo "Wrong choice. Please try again."
+        exit
     fi
     compileBlokQt
     read -p "Do you wish to run Blok? [Y/N] " yn
