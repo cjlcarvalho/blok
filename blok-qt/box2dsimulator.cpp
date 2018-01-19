@@ -17,7 +17,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#include "simulator.h"
+#include "box2dsimulator.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QTimerEvent>
@@ -34,17 +34,22 @@ static const int32 B2_VELOCITY_ITERATIONS = 8;      // krazy:exclude=staticobjec
 static const int32 B2_POSITION_ITERATIONS = 4;      // krazy:exclude=staticobjects
 static const float PI = 3.14159265359;
 
-Simulator::Simulator(QObject *parent) :
-    QObject(parent), _timerId(0), _world (0), _player(0), _ground(0), _playerString("Player")
+Box2DSimulator::Box2DSimulator(QObject *parent) :
+    ISimulator(parent),
+    _timerId(0),
+    _world (0),
+    _player(0),
+    _ground(0),
+    _playerString("Player")
 {
 }
 
-Simulator::~Simulator()
+Box2DSimulator::~Box2DSimulator()
 {
     delete _world;
 }
 
-void Simulator::BeginContact(b2Contact *contact)
+void Box2DSimulator::BeginContact(b2Contact *contact)
 {
     if ((contact->GetFixtureA()->GetBody() == _ground && contact->GetFixtureB()->GetBody() == _player) ||
         (contact->GetFixtureB()->GetBody() == _ground && contact->GetFixtureA()->GetBody() == _player))
@@ -54,53 +59,69 @@ void Simulator::BeginContact(b2Contact *contact)
     }
 }
 
-void Simulator::start()
+void Box2DSimulator::start()
 {
     if (!_timerId)
         _timerId = startTimer(3);
 }
 
-void Simulator::stop()
+void Box2DSimulator::stop()
 {
     killTimer(_timerId);
     _timerId = 0;
 }
 
-void Simulator::timerEvent(QTimerEvent *event)
+void Box2DSimulator::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == _timerId)
     {
         _world->Step(B2_TIMESTEP, B2_VELOCITY_ITERATIONS, B2_POSITION_ITERATIONS);
-        emit bodiesUpdated(m_bodies);
+
+        int size = m_bodies.size();
+        for (int i = 0; i < size; i++) {
+            b2Vec2 pos = m_bodies[i]->GetPosition();
+            m_bodiesPoints[i].setX(pos.x);
+            m_bodiesPoints[i].setY(pos.y);
+        }
+        emit bodiesUpdated(m_bodiesPoints);
     }
     QObject::timerEvent(event);
 }
 
-void Simulator::init()
+void Box2DSimulator::init()
 {
     delete _world;
     _world = new b2World(b2Vec2(0.0f, -10.0f));
     _world->SetContactListener(this);
+
     m_bodies.clear();
+    m_bodiesPoints.clear();
 
     // Ground
     _ground = createBody(0.0f, -260.0f, 900.0f, 20.0f, false);
 
     // Blocks
     int i, j;
-    for (i = 0; i < 10; ++i)
-        for (j = 0; j < 11 - i; ++j)
-           m_bodies.append(createBody(-150.0f+15*i+30*j, -236.0f+30*i, 28.0f, 28.0f));
+    for (i = 0; i < 10; ++i) {
+        for (j = 0; j < 11 - i; ++j) {
+            m_bodies.append(createBody(-150.0f+15*i+30*j, -236.0f+30*i,
+                                       28.0f, 28.0f));
+            m_bodiesPoints.append(QPointF(-150.0f+15*i+30*j, -236.0f+30*i));
+        }
+    }
 
     // Player
     j-=2;
-    m_bodies.append(_player = createBody(-150.0f+15*i+30*j, -236.0f+30*i+14, 56.0f, 56.0f));
+    m_bodies.append(_player = createBody(-150.0f+15*i+30*j, -236.0f+30*i+14,
+                                         56.0f, 56.0f));
+    m_bodiesPoints.append(QPointF(-150.0f+15*i+30*j, -236.0f+30*i+14));
     _player->SetUserData(&_playerString);
 
-    emit bodiesCreated(m_bodies);
+    emit bodiesCreated(m_bodiesPoints);
 }
 
-b2Body *Simulator::createBody(float32 x, float32 y, float32 width, float32 height, bool dynamic, float32 density, float32 friction, float32 restitution)
+b2Body *Box2DSimulator::createBody(float32 x, float32 y, float32 width, float32 height,
+                                   bool dynamic, float32 density, float32 friction, float32 restitution)
 {
     b2BodyDef bodyDef;
     if (dynamic)
@@ -120,13 +141,23 @@ b2Body *Simulator::createBody(float32 x, float32 y, float32 width, float32 heigh
     return body;
 }
 
-void Simulator::removeBody(b2Body *body)
+void Box2DSimulator::removeBody(const QPointF &body)
 {
-    _world->DestroyBody(body);
-    m_bodies.removeAll(body);
-    if (m_bodies.size() == 2)
+    int index = m_bodiesPoints.indexOf(body);
+
+    if(index != -1)
     {
-        stop();
-        emit youWon();
+        b2Body *bodyBox2D = m_bodies[index];
+
+        _world->DestroyBody(bodyBox2D);
+        m_bodies.removeAll(bodyBox2D);
+
+        m_bodiesPoints.removeAll(body);
+
+        if (m_bodies.size() == 2)
+        {
+            stop();
+            emit youWon();
+        }
     }
 }

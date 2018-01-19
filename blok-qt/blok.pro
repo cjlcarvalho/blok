@@ -12,12 +12,14 @@ LIBS += -lBox2D -lphonon
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    simulator.cpp \
-    pluginloader.cpp
+    pluginloader.cpp \
+    isimulator.cpp \
+    box2dsimulator.cpp
 
 HEADERS  += mainwindow.h \
-    simulator.h \
-    pluginloader.h
+    pluginloader.h \
+    isimulator.h \
+    box2dsimulator.h
 
 FORMS    += mainwindow.ui
 

@@ -30,11 +30,10 @@
 
 #include <phonon/MediaObject>
 
-#include <Box2D/Dynamics/b2Body.h>
-
 #include "ui_mainwindow.h"
-#include "simulator.h"
 #include "pluginloader.h"
+
+#include "box2dsimulator.h"
 
 #include "../blok-images/imagefactory.h"
 
@@ -71,13 +70,14 @@ MainWindow::MainWindow(QWidget *parent) :
     _timer.setFrameRange(0, 100);
     _animation.setTimeLine(&_timer);
 
-    _simulator = new Simulator(this);
-    connect(_simulator, SIGNAL(bodiesCreated(QList<b2Body*>)),
-                        SLOT(bodiesCreated(QList<b2Body*>)));
-    connect(_simulator, SIGNAL(bodiesUpdated(QList<b2Body*>)),
-                        SLOT(bodiesUpdated(QList<b2Body*>)));
-    connect(this, SIGNAL(bodyClicked(b2Body*)),
-            _simulator, SLOT(removeBody(b2Body*)));
+    // TODO: carregar por plugin
+    _simulator = new Box2DSimulator(this);
+    connect(_simulator, SIGNAL(bodiesCreated(QList<QPointF>)),
+                        SLOT(bodiesCreated(QList<QPointF>)));
+    connect(_simulator, SIGNAL(bodiesUpdated(QList<QPointF>)),
+                        SLOT(bodiesUpdated(QList<QPointF>)));
+    connect(this, SIGNAL(bodyClicked(QPointF)),
+            _simulator, SLOT(removeBody(QPointF)));
 
     _initialState = new QState();
     _runningState = new QState();
@@ -110,7 +110,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _stateMachine.start();
 
-    _backgroundAudio = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource(QUrl(":/resources/sounds/background.wav")));
+    _backgroundAudio = Phonon::createPlayer(Phonon::NoCategory,
+                                            Phonon::MediaSource(QUrl("qrc:///resources/sounds/background.wav")));
     connect(_backgroundAudio, SIGNAL(aboutToFinish()), SLOT(enqueueBackgroundAudio()));
     _backgroundAudio->play();
 }
@@ -186,17 +187,17 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
             if (item)
             {
-                foreach(b2Body *body, m_bodyRect.keys())
-                    if (m_bodyRect[body] == item && item != _player)
-                    {
-                        emit bodyClicked(body);
+                for (int i = 0; i < m_bodyRect.size(); i++) {
+                    if (m_bodyRect[i] == item && item != _player) {
+                        emit bodyClicked(scenePoint);
                         Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
-                                                                          Phonon::MediaSource(QUrl(":/resources/sounds/click.wav")));
+                                                                          Phonon::MediaSource(QUrl("qrc:///resources/sounds/click.wav")));
                         connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
                         audio->play();
                         _scene->removeItem(item);
                         break;
                     }
+                }
             }
         }
     }
@@ -209,23 +210,24 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return QMainWindow::eventFilter(obj, event);
 }
 
-void MainWindow::bodiesUpdated(const QList<b2Body *> &bodies)
+void MainWindow::bodiesUpdated(const QList<QPointF> &bodies)
 {
-    foreach (b2Body *body, bodies)
-    {
-        const b2Vec2 &pos = body->GetPosition();
-        m_bodyRect[body]->setPos(pos.x, -pos.y);
-    }
+    int size = bodies.size();
+    for (int i = 0; i < size; i++)
+        m_bodyRect[i]->setPos(bodies[i].x(), -bodies[i].y());
 }
 
-void MainWindow::bodiesCreated(const QList<b2Body *> &bodies)
+void MainWindow::bodiesCreated(const QList<QPointF> &bodies)
 {
     m_bodyRect.clear();
-    foreach (b2Body *body, bodies)
+
+    int i = 0;
+    int playerIndex = bodies.size() - 1;
+
+    for (const QPointF &body : bodies)
     {
-        const b2Vec2 &position = body->GetPosition();
         QGraphicsRectItem *rect = 0;
-        if (body->GetUserData())
+        if (i++ == playerIndex)
         {
             // Player
             rect = _imageFactory->createPlayerImage()->createPlayer(_scene);
@@ -236,28 +238,29 @@ void MainWindow::bodiesCreated(const QList<b2Body *> &bodies)
             // Block
             rect = _imageFactory->createBlockImage()->createBlock(_scene);
         }
-        rect->setPos(position.x, -position.y);
+        rect->setPos(body.x(), -body.y());
         rect->setPen(QPen(Qt::NoPen));
 
-        m_bodyRect[body] = rect;
+        m_bodyRect.append(rect);
     }
 }
 
 void MainWindow::setBannerMessage(const QString &bannerMessage)
 {
     _bannerMessage->setPlainText(bannerMessage);
-    _bannerMessage->setPos(-_bannerMessage->boundingRect().width()/2, -_bannerMessage->boundingRect().height()/1.25);
+    _bannerMessage->setPos(-_bannerMessage->boundingRect().width()/2,
+                           -_bannerMessage->boundingRect().height()/1.25);
 }
 
 void MainWindow::enqueueBackgroundAudio()
 {
-    _backgroundAudio->enqueue(Phonon::MediaSource(QUrl(":/resources/sounds/background.wav")));
+    _backgroundAudio->enqueue(Phonon::MediaSource(QUrl("qrc:///resources/sounds/background.wav")));
 }
 
 void MainWindow::youWon()
 {
     Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
-                                                      Phonon::MediaSource(QUrl(":/resources/sounds/youwon.wav")));
+                                                      Phonon::MediaSource(QUrl("qrc:///resources/sounds/youwon.wav")));
     connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
     audio->play();
 }
@@ -265,7 +268,7 @@ void MainWindow::youWon()
 void MainWindow::youLost()
 {
     Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
-                                                      Phonon::MediaSource(QUrl(":/resources/sounds/youlost.wav")));
+                                                      Phonon::MediaSource(QUrl("qrc:///resources/sounds/youlost.wav")));
     connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
     audio->play();
 }

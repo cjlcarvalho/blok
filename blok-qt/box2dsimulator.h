@@ -27,27 +27,22 @@
 
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 
+#include "isimulator.h"
+
 class b2World;
 class b2Body;
 
-class Simulator : public QObject, public b2ContactListener
+class Box2DSimulator : public ISimulator, public b2ContactListener
 {
-    Q_OBJECT
 public:
-    explicit Simulator(QObject *parent = 0);
-    virtual ~Simulator();
-
-Q_SIGNALS:
-    void bodiesUpdated(const QList<b2Body *> &bodies);
-    void bodiesCreated(const QList<b2Body *> &bodies);
-    void youWon();
-    void youLost();
+    explicit Box2DSimulator(QObject *parent = 0);
+    virtual ~Box2DSimulator();
     
 public Q_SLOTS:
     void init();
     void start();
     void stop();
-    void removeBody(b2Body *body);
+    void removeBody(const QPointF &body);
 
 protected:
     void timerEvent(QTimerEvent *event);

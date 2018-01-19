@@ -20,7 +20,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QTimeLine>
 #include <QtCore/QStateMachine>
 #include <QtCore/QSharedPointer>
@@ -44,7 +44,7 @@ namespace Phonon
 
 class b2Body;
 
-class Simulator;
+class ISimulator;
 class PluginLoader;
 class ImageFactory;
 
@@ -56,7 +56,7 @@ public:
     static MainWindow *instance();
 
 Q_SIGNALS:
-    void bodyClicked(b2Body *body);
+    void bodyClicked(const QPointF &body);
     void keyPressed();
 
 public Q_SLOTS:
@@ -65,8 +65,8 @@ public Q_SLOTS:
     void bannerLeave();
 
 private Q_SLOTS:
-    void bodiesUpdated(const QList<b2Body *> &bodies);
-    void bodiesCreated(const QList<b2Body *> &bodies);
+    void bodiesUpdated(const QList<QPointF> &bodies);
+    void bodiesCreated(const QList<QPointF> &bodies);
     void setBannerMessage(const QString &bannerMessage);
     void enqueueBackgroundAudio();
     void youWon();
@@ -82,7 +82,7 @@ private:
 
     QSharedPointer<Ui::MainWindow> ui;
     QGraphicsScene *_scene;
-    Simulator *_simulator;
+    ISimulator *_simulator;
     PluginLoader *_pluginLoader;
     ImageFactory *_imageFactory;
 
@@ -91,7 +91,7 @@ private:
     QTimeLine _timer;
     QGraphicsItemAnimation _animation;
 
-    QHash<b2Body *, QGraphicsRectItem *> m_bodyRect;
+    QList<QGraphicsRectItem *> m_bodyRect;
     QGraphicsRectItem *_player;
 
     QStateMachine _stateMachine;
