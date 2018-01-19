@@ -17,8 +17,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef SIMULATOR_H
-#define SIMULATOR_H
+#ifndef BOX2DSIMULATOR_H
+#define BOX2DSIMULATOR_H
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
@@ -48,7 +48,8 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
-    b2Body *createBody(float32 x, float32 y, float32 width, float32 height, bool dynamic = true, float32 density = 1.0f, float32 friction = 0.3f, float32 restitution = 0.5f);
+    b2Body *createBody(float32 x, float32 y, float32 width, float32 height, 
+                       bool dynamic = true, float32 density = 1.0f, float32 friction = 0.3f, float32 restitution = 0.5f);
     void updateBody(b2Body *body);
     virtual void BeginContact(b2Contact *contact);
 
@@ -61,4 +62,4 @@ private:
     QString _playerString;
 };
 
-#endif // SIMULATOR_H
+#endif // BOX2DSIMULATOR_H
