@@ -5,10 +5,10 @@
 
 #include "blok-images_global.h"
 
-class IBackgroundImage;
-class IGroundImage;
-class IPlayerImage;
-class IBlockImage;
+#include "ibackgroundimage.h"
+#include "igroundimage.h"
+#include "iplayerimage.h"
+#include "iblockimage.h"
 
 class BLOKIMAGESSHARED_EXPORT ImageFactory : public QObject
 {
