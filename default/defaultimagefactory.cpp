@@ -1,3 +1,8 @@
+#include "../blok-images/ibackgroundimage.h"
+#include "../blok-images/igroundimage.h"
+#include "../blok-images/iplayerimage.h"
+#include "../blok-images/iblockimage.h"
+
 #include "defaultimagefactory.h"
 #include "defaultbackgroundimage.h"
 #include "defaultgroundimage.h"
@@ -9,19 +14,23 @@ DefaultImageFactory::DefaultImageFactory()
 {
 }
 
-IBackgroundImage* DefaultImageFactory::createBackgroundImage(){
+IBackgroundImage *DefaultImageFactory::createBackgroundImage()
+{
     return new DefaultBackgroundImage;
 }
 
-IGroundImage* DefaultImageFactory::createGroundImage(){
+IGroundImage *DefaultImageFactory::createGroundImage()
+{
     return new DefaultGroundImage;
 }
 
-IPlayerImage* DefaultImageFactory::createPlayerImage(){
+IPlayerImage *DefaultImageFactory::createPlayerImage()
+{
     return new DefaultPlayerImage;
 }
 
-IBlockImage* DefaultImageFactory::createBlockImage(){
+IBlockImage *DefaultImageFactory::createBlockImage()
+{
     return new DefaultBlockImage;
 }
 

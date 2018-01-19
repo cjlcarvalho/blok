@@ -28,9 +28,6 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QGraphicsItemAnimation>
 
-#include "pluginloader.h"
-#include "../blok-images/imagefactory.h"
-
 class QGraphicsScene;
 class QGraphicsRectItem;
 class QGraphicsTextItem;
@@ -48,14 +45,15 @@ namespace Phonon
 class b2Body;
 
 class Simulator;
+class PluginLoader;
+class ImageFactory;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    static MainWindow *instance();
 
 Q_SIGNALS:
     void bodyClicked(b2Body *body);
@@ -75,9 +73,13 @@ private Q_SLOTS:
     void youLost();
 
 protected:
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
     bool eventFilter(QObject *obj, QEvent *event);
 
 private:
+    static MainWindow *m_instance;
+
     QSharedPointer<Ui::MainWindow> ui;
     QGraphicsScene *_scene;
     Simulator *_simulator;

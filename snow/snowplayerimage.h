@@ -3,11 +3,14 @@
 
 #include "../blok-images/iplayerimage.h"
 
+class QGraphicsRectItem;
+class QGraphicsScene;
+
 class SnowPlayerImage : public IPlayerImage
 {
 public:
     SnowPlayerImage();
-    QGraphicsRectItem* createPlayer(QGraphicsScene*);
+    QGraphicsRectItem *createPlayer(QGraphicsScene *scene);
 };
 
 #endif // SNOWPLAYERIMAGE_H

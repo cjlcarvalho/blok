@@ -33,9 +33,19 @@
 #include <Box2D/Dynamics/b2Body.h>
 
 #include "ui_mainwindow.h"
-
-#include <simulator.h>
+#include "simulator.h"
 #include "pluginloader.h"
+
+#include "../blok-images/imagefactory.h"
+
+MainWindow *MainWindow::m_instance = nullptr;
+
+MainWindow *MainWindow::instance()
+{
+    if(!m_instance)
+        m_instance = new MainWindow;
+    return m_instance;
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     _pluginLoader = new PluginLoader;
-    _imageFactory = _pluginLoader->getImageFactory();
+    _imageFactory = _pluginLoader->imageFactory();
 
     ui->graphicsView->setScene(_scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
@@ -100,7 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _stateMachine.start();
 
-    _backgroundAudio = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource(":/resources/sounds/background.wav"));
+    _backgroundAudio = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource(QUrl(":/resources/sounds/background.wav")));
     connect(_backgroundAudio, SIGNAL(aboutToFinish()), SLOT(enqueueBackgroundAudio()));
     _backgroundAudio->play();
 }
@@ -180,7 +190,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     if (m_bodyRect[body] == item && item != _player)
                     {
                         emit bodyClicked(body);
-                        Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource(":/resources/sounds/click.wav"));
+                        Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
+                                                                          Phonon::MediaSource(QUrl(":/resources/sounds/click.wav")));
                         connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
                         audio->play();
                         _scene->removeItem(item);
@@ -240,19 +251,21 @@ void MainWindow::setBannerMessage(const QString &bannerMessage)
 
 void MainWindow::enqueueBackgroundAudio()
 {
-    _backgroundAudio->enqueue(Phonon::MediaSource(":/resources/sounds/background.wav"));
+    _backgroundAudio->enqueue(Phonon::MediaSource(QUrl(":/resources/sounds/background.wav")));
 }
 
 void MainWindow::youWon()
 {
-    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource(":/resources/sounds/youwon.wav"));
+    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
+                                                      Phonon::MediaSource(QUrl(":/resources/sounds/youwon.wav")));
     connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
     audio->play();
 }
 
 void MainWindow::youLost()
 {
-    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory, Phonon::MediaSource(":/resources/sounds/youlost.wav"));
+    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
+                                                      Phonon::MediaSource(QUrl(":/resources/sounds/youlost.wav")));
     connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
     audio->play();
 }
