@@ -6,6 +6,10 @@
 
 - In case of problems:
 
+    - Compile blok-simulator
+
+    - Compile your simulator plugin (only Box2D for a while)
+
     - Compile blok-images
 
     - Compile your image plugin (default or snow)
