@@ -72,7 +72,7 @@ setLDLibraryPath () {
         echo ""
         echo "LD_LIBRARY_PATH variable set"
         echo ""
-        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/images_lib
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/images_lib:$PWD/simulator_lib
         export LD_LIBRARY_PATH
     fi
 }
