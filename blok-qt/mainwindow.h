@@ -32,17 +32,13 @@ class QGraphicsScene;
 class QGraphicsRectItem;
 class QGraphicsTextItem;
 
-namespace Ui
-{
-    class MainWindow;
+namespace Ui {
+class MainWindow;
 }
 
-namespace Phonon
-{
-    class MediaObject;
+namespace Phonon {
+class MediaObject;
 }
-
-class b2Body;
 
 class ISimulator;
 class PluginLoader;
@@ -51,7 +47,7 @@ class ImageFactory;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
+
 public:
     static MainWindow *instance();
 
@@ -82,6 +78,7 @@ private:
 
     QSharedPointer<Ui::MainWindow> ui;
     QGraphicsScene *_scene;
+
     ISimulator *_simulator;
     PluginLoader *_pluginLoader;
     ImageFactory *_imageFactory;
@@ -91,8 +88,7 @@ private:
     QTimeLine _timer;
     QGraphicsItemAnimation _animation;
 
-    QList<QGraphicsRectItem *> m_bodyRect;
-    QGraphicsRectItem *_player;
+    QList<QGraphicsRectItem *> _bodyRects;
 
     QStateMachine _stateMachine;
     QState *_initialState;

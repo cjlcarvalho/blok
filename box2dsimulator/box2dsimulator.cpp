@@ -1,5 +1,6 @@
 /********************************************************************************
  *   Copyright (C) 2012 by Sandro Andrade <sandroandrade@kde.org>               *
+ *   Copyright (C) 2018 by Caio Carvalho <caiojcarvalho@gmail.com>              *
  *                                                                              *
  *   This program is free software; you can redistribute it and/or modify       *
  *   it under the terms of the GNU General Public License as published by       *
@@ -51,9 +52,8 @@ Box2DSimulator::~Box2DSimulator()
 
 void Box2DSimulator::BeginContact(b2Contact *contact)
 {
-    if ((contact->GetFixtureA()->GetBody() == _ground && contact->GetFixtureB()->GetBody() == _player) ||
-        (contact->GetFixtureB()->GetBody() == _ground && contact->GetFixtureA()->GetBody() == _player))
-    {
+    if ((contact->GetFixtureA()->GetBody() == _ground && contact->GetFixtureB()->GetBody() == _player)
+        || (contact->GetFixtureB()->GetBody() == _ground && contact->GetFixtureA()->GetBody() == _player)) {
         stop();
         emit youLost();
     }
@@ -73,16 +73,15 @@ void Box2DSimulator::stop()
 
 void Box2DSimulator::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == _timerId)
-    {
+    if (event->timerId() == _timerId) {
         _world->Step(B2_TIMESTEP, B2_VELOCITY_ITERATIONS, B2_POSITION_ITERATIONS);
 
-        int size = m_bodies.size();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < m_bodies.size(); i++) {
             b2Vec2 pos = m_bodies[i]->GetPosition();
             m_bodiesPoints[i].setX(pos.x);
             m_bodiesPoints[i].setY(pos.y);
         }
+
         emit bodiesUpdated(m_bodiesPoints);
     }
     QObject::timerEvent(event);
@@ -104,17 +103,20 @@ void Box2DSimulator::init()
     int i, j;
     for (i = 0; i < 10; ++i) {
         for (j = 0; j < 11 - i; ++j) {
-            m_bodies.append(createBody(-150.0f+15*i+30*j, -236.0f+30*i,
+            m_bodies.append(createBody(-150.0f + 15 * i + 30 * j, -236.0f + 30 * i,
                                        28.0f, 28.0f));
-            m_bodiesPoints.append(QPointF(-150.0f+15*i+30*j, -236.0f+30*i));
+            m_bodiesPoints.append(QPointF(-150.0f + 15 * i + 30 * j, -236.0f + 30 * i));
         }
     }
 
     // Player
-    j-=2;
-    m_bodies.append(_player = createBody(-150.0f+15*i+30*j, -236.0f+30*i+14,
+    j -= 2;
+
+    m_bodies.append(_player = createBody(-150.0f + 15 * i + 30 * j, -236.0f + 30 * i + 14,
                                          56.0f, 56.0f));
-    m_bodiesPoints.append(QPointF(-150.0f+15*i+30*j, -236.0f+30*i+14));
+
+    m_bodiesPoints.append(QPointF(-150.0f + 15 * i + 30 * j, -236.0f + 30 * i + 14));
+
     _player->SetUserData(&_playerString);
 
     emit bodiesCreated(m_bodiesPoints);
@@ -129,7 +131,7 @@ b2Body *Box2DSimulator::createBody(float32 x, float32 y, float32 width, float32 
     bodyDef.position.Set(x, y);
     b2Body *body = _world->CreateBody(&bodyDef);
     b2PolygonShape box;
-    box.SetAsBox(width/2, height/2);
+    box.SetAsBox(width / 2, height / 2);
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &box;
     fixtureDef.density = density;
@@ -143,21 +145,24 @@ b2Body *Box2DSimulator::createBody(float32 x, float32 y, float32 width, float32 
 
 void Box2DSimulator::removeBody(const QPointF &body)
 {
-    int index = m_bodiesPoints.indexOf(body);
+    // buscando por um QPointF com o Y de body invertido
+    QPointF bodyTemp(body.x(), -body.y());
 
-    if(index != -1)
-    {
+    int index = m_bodiesPoints.indexOf(bodyTemp);
+
+    if (index != -1) {
         b2Body *bodyBox2D = m_bodies[index];
 
         _world->DestroyBody(bodyBox2D);
-        m_bodies.removeAll(bodyBox2D);
 
-        m_bodiesPoints.removeAll(body);
+        m_bodies.removeAt(index);
+        m_bodiesPoints.removeAt(index);
 
-        if (m_bodies.size() == 2)
-        {
+        if (m_bodies.size() == 2) {
             stop();
             emit youWon();
         }
     }
 }
+
+Q_EXPORT_PLUGIN2(box2dsimulator, Box2DSimulator)

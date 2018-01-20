@@ -1,5 +1,5 @@
 /********************************************************************************
- *   Copyright (C) 2012 by Sandro Andrade <sandroandrade@kde.org>               *
+ *   Copyright (C) 2018 by Caio Carvalho <caiojcarvalho@gmail.com>              *
  *                                                                              *
  *   This program is free software; you can redistribute it and/or modify       *
  *   it under the terms of the GNU General Public License as published by       *
@@ -17,49 +17,40 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef BOX2DSIMULATOR_H
-#define BOX2DSIMULATOR_H
+#ifndef ISIMULATOR_H
+#define ISIMULATOR_H
 
-#include <QtCore/QList>
-#include <QtCore/QObject>
+#include <QtPlugin>
 
-#include <QtCore/QSharedPointer>
+#include <QObject>
+#include <QList>
+#include <QPointF>
 
-#include <Box2D/Dynamics/b2WorldCallbacks.h>
+#include "blok-simulator_global.h"
 
-#include "isimulator.h"
-
-class b2World;
-class b2Body;
-
-class Box2DSimulator : public ISimulator, public b2ContactListener
+class BLOKSIMULATORSHARED_EXPORT ISimulator : public QObject
 {
-public:
-    explicit Box2DSimulator(QObject *parent = 0);
-    virtual ~Box2DSimulator();
-    
+    Q_OBJECT
+
+Q_SIGNALS:
+    void bodiesUpdated(const QList<QPointF> &bodies);
+    void bodiesCreated(const QList<QPointF> &bodies);
+    void youWon();
+    void youLost();
+
 public Q_SLOTS:
-    void init();
-    void start();
-    void stop();
-    void removeBody(const QPointF &body);
+    virtual void init() = 0;
+    virtual void start() = 0;
+    virtual void stop() = 0;
+    virtual void removeBody(const QPointF &body) = 0;
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    explicit ISimulator(QObject *parent = 0);
 
-private:
-    b2Body *createBody(float32 x, float32 y, float32 width, float32 height, 
-                       bool dynamic = true, float32 density = 1.0f, float32 friction = 0.3f, float32 restitution = 0.5f);
-    void updateBody(b2Body *body);
-    virtual void BeginContact(b2Contact *contact);
-
-    int _timerId;
-    b2World *_world;
-    QList<b2Body *> m_bodies;
-    b2Body *_player;
-    b2Body *_ground;
-
-    QString _playerString;
+protected:
+    QList<QPointF> m_bodiesPoints;
 };
 
-#endif // BOX2DSIMULATOR_H
+Q_DECLARE_INTERFACE(ISimulator, "org.qt-project.blok-simulator.ISimulator")
+
+#endif // ISIMULATOR_H

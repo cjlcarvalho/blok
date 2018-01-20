@@ -1,4 +1,5 @@
 /********************************************************************************
+ *   Copyright (C) 2012 by Sandro Andrade <sandroandrade@kde.org>               *
  *   Copyright (C) 2018 by Caio Carvalho <caiojcarvalho@gmail.com>              *
  *                                                                              *
  *   This program is free software; you can redistribute it and/or modify       *
@@ -17,27 +18,53 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef PLUGINLOADER_H
-#define PLUGINLOADER_H
+#ifndef BOX2DSIMULATOR_H
+#define BOX2DSIMULATOR_H
 
-#include <QObject>
+#include <QtPlugin>
 
-class ImageFactory;
-class ISimulator;
+#include <QtCore/QList>
+#include <QtCore/QObject>
 
-class PluginLoader
+#include <QtCore/QSharedPointer>
+
+#include <Box2D/Dynamics/b2WorldCallbacks.h>
+
+#include "box2dsimulator_global.h"
+
+#include "../blok-simulator/isimulator.h"
+
+class b2World;
+class b2Body;
+
+class BOX2DSIMULATORSHARED_EXPORT Box2DSimulator : public ISimulator, public b2ContactListener
 {
 public:
-    PluginLoader();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
+    explicit Box2DSimulator(QObject *parent = 0);
+    virtual ~Box2DSimulator();
+
+public Q_SLOTS:
+    void init() override;
+    void start() override;
+    void stop() override;
+    void removeBody(const QPointF &body) override;
 
 protected:
-    QObject *retrievePlugin(QString pluginDirPath);
+    void timerEvent(QTimerEvent *event);
 
 private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
+    b2Body *createBody(float32 x, float32 y, float32 width, float32 height,
+                       bool dynamic = true, float32 density = 1.0f, float32 friction = 0.3f, float32 restitution = 0.5f);
+    void updateBody(b2Body *body);
+    virtual void BeginContact(b2Contact *contact);
+
+    int _timerId;
+    b2World *_world;
+    QList<b2Body *> m_bodies;
+    b2Body *_player;
+    b2Body *_ground;
+
+    QString _playerString;
 };
 
-#endif // PLUGINLOADER_H
+#endif // BOX2DSIMULATOR_H

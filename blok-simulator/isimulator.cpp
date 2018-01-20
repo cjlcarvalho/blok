@@ -17,27 +17,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef PLUGINLOADER_H
-#define PLUGINLOADER_H
+#include "isimulator.h"
 
-#include <QObject>
-
-class ImageFactory;
-class ISimulator;
-
-class PluginLoader
+ISimulator::ISimulator(QObject *parent) :
+    QObject(parent)
 {
-public:
-    PluginLoader();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
 
-protected:
-    QObject *retrievePlugin(QString pluginDirPath);
-
-private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
-};
-
-#endif // PLUGINLOADER_H
+}

@@ -32,6 +32,13 @@ compileBlokImages () {
     make -j 5
 }
 
+compileBlokSimulator () {
+    setRootDir
+    cd blok-simulator
+    qmake-qt4
+    make -j 5
+}
+
 compileSnowPlugin () {
     setRootDir
     cd snow
@@ -49,6 +56,13 @@ compileDefaultPlugin () {
 compileStarWarsPlugin () {
     setRootDir
     cd starwars
+    qmake-qt4
+    make -j 5
+}
+
+compileBox2DSimulatorPlugin () {
+    setRootDir
+    cd box2dsimulator
     qmake-qt4
     make -j 5
 }
@@ -71,27 +85,54 @@ compileBlokQt () {
     make -j 5
 }
 
-changePlugin () {
+changeSimulatorPlugin () {
+    setRootDir
+    cd simulator_plugins
+    rm -f *.so
+    if [[ $1 == "box2d" ]]; then
+        echo "Compiling Box 2D Simulator plugin..."
+        compileBox2DSimulatorPlugin
+    else
+        echo "Wrong choice. Please try again."
+        exit
+    fi
+}
+
+changeImagePlugin () {
     setRootDir
     cd images_plugins
     rm -f *.so
     if [[ $1 == "default" ]]; then
-	echo "Compiling Default image plugin..."
+	    echo "Compiling Default image plugin..."
         compileDefaultPlugin
     elif [[ $1 == "snow" ]]; then
-	echo "Compiling Snow image plugin..."
-	compileSnowPlugin
+	    echo "Compiling Snow image plugin..."
+	    compileSnowPlugin
     elif [[ $1 == "starwars" ]]; then
-	echo "Compiling Star Wars image plugin..."
-	compileStarWarsPlugin
+	    echo "Compiling Star Wars image plugin..."
+	    compileStarWarsPlugin
     else
-	echo "Wrong choice. Please try again."
-	exit
+	    echo "Wrong choice. Please try again."
+	    exit
     fi
 }
 
 compile () {
     clean
+    
+    compileBlokSimulator
+    echo ""
+    echo "Select your simulator plugin:"
+    echo "[1] - BOX 2D SIMULATOR"
+    read -p "Option: " plugin
+    if [[ $plugin == "1" ]]; then
+        echo "Compiling Box 2D Simulator plugin..."
+        compileBox2DSimulatorPlugin
+    else
+        echo "Wrong choice. Please try again."
+        exit
+    fi
+
     compileBlokImages
     echo ""
     echo "Select your image plugin:"
@@ -112,6 +153,7 @@ compile () {
         echo "Wrong choice. Please try again."
         exit
     fi
+    
     compileBlokQt
     echo ""
     read -p "Do you want to run Blok? [Y/N] " yn
@@ -144,8 +186,10 @@ main () {
     elif [[ "$1" == "clean" ]]; then
         echo "Cleaning directories..."
         clean
-    elif [[ "$1" == "change" ]]; then
-	changePlugin $2
+    elif [[ "$1" == "changeImage" ]]; then
+	    changeImagePlugin $2
+    elif [[ "$1" == "changeSimulator" ]]; then
+        changeSimulatorPlugin $2
     else
         echo "Wrong parameter"
         echo "Usage: ./blok.sh [compile/run/clean]"

@@ -23,13 +23,19 @@
 #include <QPluginLoader>
 
 #include "../blok-images/imagefactory.h"
+#include "../blok-simulator/isimulator.h"
+
 #include "pluginloader.h"
 
 PluginLoader::PluginLoader()
 {
     QObject *imagePlugin = retrievePlugin("images_plugins/");
-    if(imagePlugin)
-        m_imageFactory = qobject_cast<ImageFactory *>(imagePlugin);
+    if (imagePlugin)
+        m_imageFactory = dynamic_cast<ImageFactory *>(imagePlugin);
+
+    QObject *simulatorPlugin = retrievePlugin("simulator_plugins/");
+    if (simulatorPlugin)
+        m_simulator = dynamic_cast<ISimulator *>(simulatorPlugin);
 }
 
 QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
@@ -50,9 +56,8 @@ QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
     pluginsDir.cdUp();
     pluginsDir.cd(pluginDirPath);
 
-    for (const QString& file : pluginsDir.entryList(QDir::Files)) {
-
-        if(!QLibrary::isLibrary(pluginsDir.absoluteFilePath(file)))
+    for (const QString &file : pluginsDir.entryList(QDir::Files)) {
+        if (!QLibrary::isLibrary(pluginsDir.absoluteFilePath(file)))
             continue;
 
         qDebug() << "Arquivo: " << pluginsDir.absoluteFilePath(file);
@@ -67,4 +72,9 @@ QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
 ImageFactory *PluginLoader::imageFactory() const
 {
     return m_imageFactory;
+}
+
+ISimulator *PluginLoader::simulator() const
+{
+    return m_simulator;
 }

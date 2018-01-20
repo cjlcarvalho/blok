@@ -33,15 +33,14 @@
 #include "ui_mainwindow.h"
 #include "pluginloader.h"
 
-#include "box2dsimulator.h"
-
 #include "../blok-images/imagefactory.h"
+#include "../blok-simulator/isimulator.h"
 
 MainWindow *MainWindow::m_instance = nullptr;
 
 MainWindow *MainWindow::instance()
 {
-    if(!m_instance)
+    if (!m_instance)
         m_instance = new MainWindow;
     return m_instance;
 }
@@ -58,7 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _scene = new QGraphicsScene;
     _scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    _pluginLoader = new PluginLoader;
+    _pluginLoader = new PluginLoader();
+
     _imageFactory = _pluginLoader->imageFactory();
 
     ui->graphicsView->setScene(_scene);
@@ -70,12 +70,12 @@ MainWindow::MainWindow(QWidget *parent) :
     _timer.setFrameRange(0, 100);
     _animation.setTimeLine(&_timer);
 
-    // TODO: carregar por plugin
-    _simulator = new Box2DSimulator(this);
+    _simulator = _pluginLoader->simulator();
+
     connect(_simulator, SIGNAL(bodiesCreated(QList<QPointF>)),
-                        SLOT(bodiesCreated(QList<QPointF>)));
+            SLOT(bodiesCreated(QList<QPointF>)));
     connect(_simulator, SIGNAL(bodiesUpdated(QList<QPointF>)),
-                        SLOT(bodiesUpdated(QList<QPointF>)));
+            SLOT(bodiesUpdated(QList<QPointF>)));
     connect(this, SIGNAL(bodyClicked(QPointF)),
             _simulator, SLOT(removeBody(QPointF)));
 
@@ -137,11 +137,12 @@ void MainWindow::init()
 
     _bannerMessage = new QGraphicsTextItem(_banner);
     _bannerMessage->setFont(QFont("Times", 18, QFont::Bold));
-    _bannerMessage->setPos(-_bannerMessage->boundingRect().width()/2, -_bannerMessage->boundingRect().height()/1.25);
+    _bannerMessage->setPos(-_bannerMessage->boundingRect().width() / 2,
+                           -_bannerMessage->boundingRect().height() / 1.25);
 
     QGraphicsTextItem *text2 = new QGraphicsTextItem("Press any key to start", _banner);
     text2->setFont(QFont("Times", 10, QFont::Bold));
-    text2->setPos(-text2->boundingRect().width()/2, text2->boundingRect().height());
+    text2->setPos(-text2->boundingRect().width() / 2, text2->boundingRect().height());
 
     // Ground
     _imageFactory->createGroundImage()->createGround(_scene);
@@ -149,17 +150,17 @@ void MainWindow::init()
 
 void MainWindow::bannerEnter()
 {
-    if(_stateMachine.configuration().contains(_initialState))
+    if (_stateMachine.configuration().contains(_initialState))
         setBannerMessage("Remove all the blocks but do not\nlet this guy hit the ground, okay ?");
-    if(_stateMachine.configuration().contains(_youWonState))
+    if (_stateMachine.configuration().contains(_youWonState))
         setBannerMessage("Congratulations ! You won !");
-    if(_stateMachine.configuration().contains(_youLostState))
+    if (_stateMachine.configuration().contains(_youLostState))
         setBannerMessage("I'm sorry, you lost ! Try again !");
 
     _animation.setItem(_banner);
 
     for (int i = 0; i < 200; ++i)
-        _animation.setPosAt(i / 200.0, QPointF(800-i*4, -200));
+        _animation.setPosAt(i / 200.0, QPointF(800 - i * 4, -200));
 
     _timer.start();
 }
@@ -169,32 +170,36 @@ void MainWindow::bannerLeave()
     _animation.setItem(_banner);
 
     for (int i = 0; i < 200; ++i)
-        _animation.setPosAt(i / 200.0, QPointF(i*4, -200));
+        _animation.setPosAt(i / 200.0, QPointF(i * 4, -200));
 
     _timer.start();
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if (_stateMachine.configuration().contains(_runningState) && event->type() == QEvent::MouseButtonPress)
-    {
+    if (_stateMachine.configuration().contains(_runningState)
+            && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
-        if (mouseEvent)
-        {
+        if (mouseEvent) {
             QPoint point =  mouseEvent->pos();
             QPointF scenePoint = ui->graphicsView->mapToScene(point);
             QGraphicsItem *item = ui->graphicsView->scene()->itemAt(scenePoint);
 
-            if (item)
-            {
-                for (int i = 0; i < m_bodyRect.size(); i++) {
-                    if (m_bodyRect[i] == item && item != _player) {
-                        emit bodyClicked(scenePoint);
+            if (item) {
+                for (int i = 0; i < _bodyRects.size(); i++) {
+                    if (_bodyRects[i] == item && i != (_bodyRects.size() - 1)) {
+                        emit bodyClicked(_bodyRects[i]->pos());
+
+                        _bodyRects.removeAt(i);
+
                         Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
                                                                           Phonon::MediaSource(QUrl("qrc:///resources/sounds/click.wav")));
+
                         connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
                         audio->play();
+
                         _scene->removeItem(item);
+
                         break;
                     }
                 }
@@ -202,9 +207,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         }
     }
     if ((_stateMachine.configuration().contains(_initialState) ||
-         _stateMachine.configuration().contains(_youWonState) ||
-         _stateMachine.configuration().contains(_youLostState)) &&
-         event->type() == QEvent::KeyPress && _timer.state() == QTimeLine::NotRunning)
+            _stateMachine.configuration().contains(_youWonState) ||
+            _stateMachine.configuration().contains(_youLostState)) &&
+            event->type() == QEvent::KeyPress && _timer.state() == QTimeLine::NotRunning)
         emit keyPressed();
 
     return QMainWindow::eventFilter(obj, event);
@@ -212,44 +217,34 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::bodiesUpdated(const QList<QPointF> &bodies)
 {
-    int size = bodies.size();
-    for (int i = 0; i < size; i++)
-        m_bodyRect[i]->setPos(bodies[i].x(), -bodies[i].y());
+    for (int i = 0; i < bodies.size(); i++)
+        _bodyRects[i]->setPos(bodies[i].x(), -bodies[i].y());
 }
 
 void MainWindow::bodiesCreated(const QList<QPointF> &bodies)
 {
-    m_bodyRect.clear();
+    _bodyRects.clear();
 
-    int i = 0;
-    int playerIndex = bodies.size() - 1;
-
-    for (const QPointF &body : bodies)
-    {
+    for (int i = 0; i < bodies.size(); i++) {
         QGraphicsRectItem *rect = 0;
-        if (i++ == playerIndex)
-        {
-            // Player
+
+        if (i == (bodies.size() - 1)) // Player
             rect = _imageFactory->createPlayerImage()->createPlayer(_scene);
-            _player = rect;
-        }
-        else
-        {
-            // Block
+        else // Block
             rect = _imageFactory->createBlockImage()->createBlock(_scene);
-        }
-        rect->setPos(body.x(), -body.y());
+
+        rect->setPos(bodies[i].x(), -bodies[i].y());
         rect->setPen(QPen(Qt::NoPen));
 
-        m_bodyRect.append(rect);
+        _bodyRects.append(rect);
     }
 }
 
 void MainWindow::setBannerMessage(const QString &bannerMessage)
 {
     _bannerMessage->setPlainText(bannerMessage);
-    _bannerMessage->setPos(-_bannerMessage->boundingRect().width()/2,
-                           -_bannerMessage->boundingRect().height()/1.25);
+    _bannerMessage->setPos(-_bannerMessage->boundingRect().width() / 2,
+                           -_bannerMessage->boundingRect().height() / 1.25);
 }
 
 void MainWindow::enqueueBackgroundAudio()

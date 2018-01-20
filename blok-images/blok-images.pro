@@ -7,7 +7,7 @@
 QT       += core widgets
 
 TARGET = blok-images
-TEMPLATE = lib static
+TEMPLATE = lib
 
 DEFINES += BLOKIMAGES_LIBRARY
 DESTDIR = ../images_lib
