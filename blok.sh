@@ -23,6 +23,12 @@ clean () {
     rm -f *.so
     cd ../images_plugins
     rm -f *.so
+    
+    setRootDir
+    cd blok-simulator
+    make clean
+    cd ../box2dsimulator
+    make clean
 }
 
 compileBlokImages () {
