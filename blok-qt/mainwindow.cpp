@@ -169,7 +169,9 @@ void MainWindow::updateImageFactoriesMenu(const QList<ImageFactory *> &imageFact
     imageMenu[0]->clear();
 
     for (ImageFactory *factory : imageFactories) {
-        QAction *action = new QAction(factory->metaObject()->className(), factory);
+        QString title = QString(factory->metaObject()->className()).replace("ImageFactory", QString());
+
+        QAction *action = new QAction(title, factory);
 
         connect(action, SIGNAL(triggered(bool)), this, SLOT(reloadWindow()));
 
@@ -187,7 +189,9 @@ void MainWindow::updateSimulatorsMenu(const QList<ISimulator *> &simulators)
     simulatorMenu[0]->clear();
 
     for (ISimulator *simulator : simulators) {
-        QAction *action = new QAction(simulator->metaObject()->className(), simulator);
+        QString title = QString(simulator->metaObject()->className()).replace("Simulator", QString());
+
+        QAction *action = new QAction(title, simulator);
 
         connect(action, SIGNAL(triggered(bool)), this, SLOT(reloadWindow()));
 
@@ -205,7 +209,9 @@ void MainWindow::updateAudioMenu(const QList<IAudio *> &audios)
     audioMenu[0]->clear();
 
     for (IAudio *audio : audios) {
-        QAction *action = new QAction(audio->metaObject()->className(), audio);
+        QString title = QString(audio->metaObject()->className()).replace("Audio", QString());
+
+        QAction *action = new QAction(title, audio);
 
         connect(action, SIGNAL(triggered(bool)), this, SLOT(reloadWindow()));
 
@@ -219,21 +225,21 @@ void MainWindow::reloadWindow()
 
     ImageFactory *factory = dynamic_cast<ImageFactory *>(action->parent());
 
-    if (factory) {
+    if (factory && factory->metaObject()->className() != _imageFactory->metaObject()->className()) {
         MainWindow::reload(factory, _simulator, _audio->clone());
         return;
     }
 
     ISimulator *simulator = dynamic_cast<ISimulator *>(action->parent());
 
-    if (simulator) {
+    if (simulator && simulator->metaObject()->className() != _simulator->metaObject()->className()) {
         MainWindow::reload(_imageFactory, simulator, _audio->clone());
         return;
     }
 
     IAudio *audio = dynamic_cast<IAudio *>(action->parent());
 
-    if (audio) {
+    if (audio && audio->metaObject()->className() != _audio->metaObject()->className()) {
         MainWindow::reload(_imageFactory, _simulator, audio);
         return;
     }
