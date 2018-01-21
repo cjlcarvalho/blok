@@ -40,7 +40,13 @@ MainWindow *MainWindow::instance()
 {
     if (!m_instance)
         m_instance = new MainWindow;
+
     return m_instance;
+}
+
+void MainWindow::destroyInstance()
+{
+    delete m_instance;
 }
 
 MainWindow::MainWindow(ImageFactory *imageFactory,
@@ -70,7 +76,10 @@ MainWindow::MainWindow(ImageFactory *imageFactory,
 
 MainWindow::~MainWindow()
 {
+    delete _imageFactory;
+    delete _simulator;
     delete _audio;
+    delete _pluginLoader;
 }
 
 void MainWindow::updateWindow()
@@ -87,6 +96,11 @@ void MainWindow::updateWindow()
     ui->graphicsView->setMaximumSize(1000, 600);
     ui->graphicsView->setMinimumSize(1000, 600);
     ui->graphicsView->installEventFilter(this);
+
+    if (!pluginsLoaded()) {
+        qDebug() << "Couldn't load some plugins";
+        return;
+    }
 
     QMenu *imageMenu = ui->menuBar->addMenu(tr("&Image"));
     imageMenu->setObjectName(tr("&Image"));
@@ -150,6 +164,11 @@ void MainWindow::updateWindow()
     _audio->startBackgroundAudio("qrc:///resources/sounds/background.wav");
 
     startMenus();
+}
+
+bool MainWindow::pluginsLoaded() const
+{
+    return _imageFactory && _simulator && _audio;
 }
 
 void MainWindow::startMenus()

@@ -26,7 +26,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MainWindow *w = MainWindow::instance();
-    w->show();
+
+    if (w->pluginsLoaded())
+        w->show();
+    else
+        MainWindow::destroyInstance();
 
     return a.exec();
 }

@@ -48,6 +48,8 @@ class MainWindow : public QMainWindow
 
 public:
     static MainWindow *instance();
+    static void destroyInstance();
+    bool pluginsLoaded() const;
 
 Q_SIGNALS:
     void bodyClicked(const QPointF &body);

@@ -30,8 +30,10 @@ PhononAudio::PhononAudio() :
 
 PhononAudio::~PhononAudio()
 {
-    m_backgroundAudio->stop();
-    delete m_backgroundAudio;
+    if (m_backgroundAudio) {
+        m_backgroundAudio->stop();
+        delete m_backgroundAudio;
+    }
 }
 
 IAudio *PhononAudio::clone()
