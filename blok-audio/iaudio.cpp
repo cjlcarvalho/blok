@@ -17,30 +17,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef PLUGINLOADER_H
-#define PLUGINLOADER_H
+#include "iaudio.h"
 
-#include <QObject>
-
-class ImageFactory;
-class ISimulator;
-class IAudio;
-
-class PluginLoader
+IAudio::~IAudio()
 {
-public:
-    PluginLoader();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
-    IAudio *audio() const;
 
-protected:
-    QObject *retrievePlugin(QString pluginDirPath);
-
-private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
-    IAudio *m_audio;
-};
-
-#endif // PLUGINLOADER_H
+}

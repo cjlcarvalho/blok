@@ -36,13 +36,10 @@ namespace Ui {
 class MainWindow;
 }
 
-namespace Phonon {
-class MediaObject;
-}
-
-class ISimulator;
 class PluginLoader;
+class ISimulator;
 class ImageFactory;
+class IAudio;
 
 class MainWindow : public QMainWindow
 {
@@ -64,7 +61,6 @@ private Q_SLOTS:
     void bodiesUpdated(const QList<QPointF> &bodies);
     void bodiesCreated(const QList<QPointF> &bodies);
     void setBannerMessage(const QString &bannerMessage);
-    void enqueueBackgroundAudio();
     void youWon();
     void youLost();
 
@@ -79,9 +75,11 @@ private:
     QSharedPointer<Ui::MainWindow> ui;
     QGraphicsScene *_scene;
 
-    ISimulator *_simulator;
     PluginLoader *_pluginLoader;
+
+    ISimulator *_simulator;
     ImageFactory *_imageFactory;
+    IAudio *_audio;
 
     QGraphicsRectItem *_banner;
     QGraphicsTextItem *_bannerMessage;
@@ -95,8 +93,6 @@ private:
     QState *_runningState;
     QState *_youWonState;
     QState *_youLostState;
-
-    Phonon::MediaObject *_backgroundAudio;
 };
 
 #endif // MAINWINDOW_H

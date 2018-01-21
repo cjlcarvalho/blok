@@ -17,30 +17,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef PLUGINLOADER_H
-#define PLUGINLOADER_H
+#ifndef IAUDIO_H
+#define IAUDIO_H
+
+#include "blok-audio_global.h"
 
 #include <QObject>
 
-class ImageFactory;
-class ISimulator;
-class IAudio;
-
-class PluginLoader
+class BLOKAUDIOSHARED_EXPORT IAudio : public QObject
 {
+    Q_OBJECT
+
 public:
-    PluginLoader();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
-    IAudio *audio() const;
+    virtual ~IAudio() = 0;
+    virtual void startBackgroundAudio(const QString &audioPath) = 0;
+    virtual void playClickAudio(const QString &audioPath) = 0;
+    virtual void playYouWonAudio(const QString &audioPath) = 0;
+    virtual void playYouLostAudio(const QString &audioPath) = 0;
+
+protected Q_SLOTS:
+    virtual void enqueueBackgroundAudioSlot() = 0;
 
 protected:
-    QObject *retrievePlugin(QString pluginDirPath);
-
-private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
-    IAudio *m_audio;
+    virtual void play(const QString &audioPath) = 0;
 };
 
-#endif // PLUGINLOADER_H
+Q_DECLARE_INTERFACE(IAudio, "org.qt-project.blok-audio.IAudio")
+
+#endif // IAUDIO_H

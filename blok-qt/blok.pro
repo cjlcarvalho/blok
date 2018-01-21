@@ -8,7 +8,6 @@ QT       += core gui widgets
 
 TARGET = blok
 TEMPLATE = app
-LIBS += -lphonon
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -35,3 +34,10 @@ else:unix: LIBS += -L$$PWD/../simulator_lib/ -lblok-simulator
 
 INCLUDEPATH += $$PWD/../simulator_lib
 DEPENDPATH += $$PWD/../simulator_lib
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../audio_lib/release/ -lblok-audio
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../audio_lib/debug/ -lblok-audio
+else:unix: LIBS += -L$$PWD/../audio_lib/ -lblok-audio
+
+INCLUDEPATH += $$PWD/../audio_lib
+DEPENDPATH += $$PWD/../audio_lib

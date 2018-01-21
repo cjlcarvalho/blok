@@ -28,13 +28,12 @@
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItemAnimation>
 
-#include <phonon/MediaObject>
-
 #include "ui_mainwindow.h"
 #include "pluginloader.h"
 
 #include "../blok-images/imagefactory.h"
 #include "../blok-simulator/isimulator.h"
+#include "../blok-audio/iaudio.h"
 
 MainWindow *MainWindow::m_instance = nullptr;
 
@@ -110,16 +109,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _stateMachine.start();
 
-    _backgroundAudio = Phonon::createPlayer(Phonon::NoCategory,
-                                            Phonon::MediaSource(QUrl("qrc:///resources/sounds/background.wav")));
-    connect(_backgroundAudio, SIGNAL(aboutToFinish()), SLOT(enqueueBackgroundAudio()));
-    _backgroundAudio->play();
+    _audio = _pluginLoader->audio();
+
+    _audio->startBackgroundAudio("qrc:///resources/sounds/background.wav");
 }
 
 MainWindow::~MainWindow()
 {
-    _backgroundAudio->stop();
-    delete _backgroundAudio;
+    delete _audio;
 }
 
 void MainWindow::init()
@@ -192,11 +189,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
                         _bodyRects.removeAt(i);
 
-                        Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
-                                                                          Phonon::MediaSource(QUrl("qrc:///resources/sounds/click.wav")));
-
-                        connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
-                        audio->play();
+                        _audio->playClickAudio("qrc:///resources/sounds/click.wav");
 
                         _scene->removeItem(item);
 
@@ -247,23 +240,12 @@ void MainWindow::setBannerMessage(const QString &bannerMessage)
                            -_bannerMessage->boundingRect().height() / 1.25);
 }
 
-void MainWindow::enqueueBackgroundAudio()
-{
-    _backgroundAudio->enqueue(Phonon::MediaSource(QUrl("qrc:///resources/sounds/background.wav")));
-}
-
 void MainWindow::youWon()
 {
-    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
-                                                      Phonon::MediaSource(QUrl("qrc:///resources/sounds/youwon.wav")));
-    connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
-    audio->play();
+    _audio->playYouWonAudio("qrc:///resources/sounds/youwon.wav");
 }
 
 void MainWindow::youLost()
 {
-    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
-                                                      Phonon::MediaSource(QUrl("qrc:///resources/sounds/youlost.wav")));
-    connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
-    audio->play();
+    _audio->playYouLostAudio("qrc:///resources/sounds/youlost.wav");
 }

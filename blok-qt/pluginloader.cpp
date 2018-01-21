@@ -24,6 +24,7 @@
 
 #include "../blok-images/imagefactory.h"
 #include "../blok-simulator/isimulator.h"
+#include "../blok-audio/iaudio.h"
 
 #include "pluginloader.h"
 
@@ -36,6 +37,10 @@ PluginLoader::PluginLoader()
     QObject *simulatorPlugin = retrievePlugin("simulator_plugins/");
     if (simulatorPlugin)
         m_simulator = dynamic_cast<ISimulator *>(simulatorPlugin);
+
+    QObject *audioPlugin = retrievePlugin("audio_plugins/");
+    if (audioPlugin)
+        m_audio = dynamic_cast<IAudio *>(audioPlugin);
 }
 
 QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
@@ -77,4 +82,9 @@ ImageFactory *PluginLoader::imageFactory() const
 ISimulator *PluginLoader::simulator() const
 {
     return m_simulator;
+}
+
+IAudio *PluginLoader::audio() const
+{
+    return m_audio;
 }

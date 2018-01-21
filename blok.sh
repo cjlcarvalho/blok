@@ -29,6 +29,12 @@ clean () {
     make clean
     cd ../box2dsimulator
     make clean
+
+    setRootDir
+    cd blok-audio
+    make clean
+    cd ../phononaudio
+    make clean
 }
 
 compileBlokImages () {
@@ -41,6 +47,13 @@ compileBlokImages () {
 compileBlokSimulator () {
     setRootDir
     cd blok-simulator
+    qmake-qt4
+    make -j 5
+}
+
+compileBlokAudio () {
+    setRootDir
+    cd blok-audio
     qmake-qt4
     make -j 5
 }
@@ -73,12 +86,19 @@ compileBox2DSimulatorPlugin () {
     make -j 5
 }
 
+compilePhononPlugin () {
+    setRootDir
+    cd phononaudio
+    qmake-qt4
+    make -j 5
+}
+
 setLDLibraryPath () {
     if [[ $LD_LIBRARY_PATH != *"$PWD/images_lib"* ]]; then
         echo ""
         echo "LD_LIBRARY_PATH variable set"
         echo ""
-        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/images_lib:$PWD/simulator_lib
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/images_lib:$PWD/simulator_lib:$PWD/audio_lib
         export LD_LIBRARY_PATH
     fi
 }
@@ -89,6 +109,19 @@ compileBlokQt () {
     cd blok-qt
     qmake-qt4
     make -j 5
+}
+
+changeAudioPlugin () {
+    setRootDir
+    cd audio_plugins
+    rm -f *.so
+    if [[ $1 == "phononaudio" ]]; then
+        echo "Compiling Phonon Audio plugin..."
+        compilePhononPlugin
+    else
+        echo "Wrong choice. Please try again."
+        exit
+    fi
 }
 
 changeSimulatorPlugin () {
@@ -134,6 +167,19 @@ compile () {
     if [[ $plugin == "1" ]]; then
         echo "Compiling Box 2D Simulator plugin..."
         compileBox2DSimulatorPlugin
+    else
+        echo "Wrong choice. Please try again."
+        exit
+    fi
+    
+    compileBlokAudio
+    echo ""
+    echo "Select your audio plugin:"
+    echo "[1] - PHONON AUDIO PLUGIN"
+    read -p "Option: " plugin
+    if [[ $plugin == "1" ]]; then
+        echo "Compiling Phonon Audio plugin..."
+        compilePhononPlugin
     else
         echo "Wrong choice. Please try again."
         exit
@@ -196,6 +242,8 @@ main () {
 	    changeImagePlugin $2
     elif [[ "$1" == "changeSimulator" ]]; then
         changeSimulatorPlugin $2
+    elif [[ "$1" == "changeAudio" ]]; then
+        changeAudioPlugin $2
     else
         echo "Wrong parameter"
         echo "Usage: ./blok.sh [compile/run/clean]"

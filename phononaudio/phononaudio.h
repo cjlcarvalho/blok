@@ -17,30 +17,41 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef PLUGINLOADER_H
-#define PLUGINLOADER_H
+#ifndef PHONONAUDIO_H
+#define PHONONAUDIO_H
 
-#include <QObject>
+#include <QtPlugin>
 
-class ImageFactory;
-class ISimulator;
-class IAudio;
+#include "phononaudio_global.h"
 
-class PluginLoader
+#include "../blok-audio/iaudio.h"
+
+namespace Phonon {
+class MediaObject;
+}
+
+class PHONONAUDIOSHARED_EXPORT PhononAudio : public IAudio
 {
+    Q_INTERFACES(IAudio)
 public:
-    PluginLoader();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
-    IAudio *audio() const;
+    PhononAudio();
+    ~PhononAudio() override;
+    void startBackgroundAudio(const QString &audioPath) override;
+    void playClickAudio(const QString &audioPath) override;
+    void playYouWonAudio(const QString &audioPath) override;
+    void playYouLostAudio(const QString &audioPath) override;
 
-protected:
-    QObject *retrievePlugin(QString pluginDirPath);
+protected Q_SLOTS:
+    void enqueueBackgroundAudioSlot() override;
 
 private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
-    IAudio *m_audio;
+    void play(const QString &audioPath) override;
+
+private:
+    Phonon::MediaObject *m_backgroundAudio;
+    QString m_backgroundAudioPath;
 };
 
-#endif // PLUGINLOADER_H
+Q_EXPORT_PLUGIN2(phononaudio, PhononAudio)
+
+#endif // PHONONAUDIO_H

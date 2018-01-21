@@ -17,30 +17,62 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .             *
  *******************************************************************************/
 
-#ifndef PLUGINLOADER_H
-#define PLUGINLOADER_H
+#include <phonon/MediaObject>
 
-#include <QObject>
+#include "phononaudio.h"
 
-class ImageFactory;
-class ISimulator;
-class IAudio;
-
-class PluginLoader
+PhononAudio::PhononAudio() :
+    m_backgroundAudio(nullptr),
+    m_backgroundAudioPath(QString())
 {
-public:
-    PluginLoader();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
-    IAudio *audio() const;
 
-protected:
-    QObject *retrievePlugin(QString pluginDirPath);
+}
 
-private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
-    IAudio *m_audio;
-};
+PhononAudio::~PhononAudio()
+{
+    m_backgroundAudio->stop();
+    delete m_backgroundAudio;
+}
 
-#endif // PLUGINLOADER_H
+void PhononAudio::startBackgroundAudio(const QString &audioPath)
+{
+    m_backgroundAudioPath = audioPath;
+
+    m_backgroundAudio = Phonon::createPlayer(Phonon::NoCategory,
+                                             Phonon::MediaSource(QUrl(audioPath)));
+
+    connect(m_backgroundAudio, SIGNAL(aboutToFinish()),
+                               SLOT(enqueueBackgroundAudioSlot()));
+
+    m_backgroundAudio->play();
+}
+
+void PhononAudio::play(const QString &audioPath)
+{
+    Phonon::MediaObject *audio = Phonon::createPlayer(Phonon::NoCategory,
+                                                      Phonon::MediaSource(QUrl(audioPath)));
+
+    connect(audio, SIGNAL(finished()), audio, SLOT(deleteLater()));
+
+    audio->play();
+}
+
+void PhononAudio::playClickAudio(const QString &audioPath)
+{
+    play(audioPath);
+}
+
+void PhononAudio::playYouWonAudio(const QString &audioPath)
+{
+    play(audioPath);
+}
+
+void PhononAudio::playYouLostAudio(const QString &audioPath)
+{
+    play(audioPath);
+}
+
+void PhononAudio::enqueueBackgroundAudioSlot()
+{
+    m_backgroundAudio->enqueue(Phonon::MediaSource(QUrl(m_backgroundAudioPath)));
+}

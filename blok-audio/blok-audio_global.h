@@ -1,0 +1,12 @@
+#ifndef BLOKAUDIO_GLOBAL_H
+#define BLOKAUDIO_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(BLOKAUDIO_LIBRARY)
+#  define BLOKAUDIOSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define BLOKAUDIOSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // BLOKAUDIO_GLOBAL_H
