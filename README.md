@@ -9,6 +9,10 @@
     - Compile blok-simulator
 
     - Compile your simulator plugin (only Box2D for a while)
+    
+    - Compile blok-audio
+    
+    - Compile your audio plugin (only Phonon for a while)
 
     - Compile blok-images
 
