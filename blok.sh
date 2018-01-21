@@ -23,6 +23,10 @@ clean () {
     rm -f *.so
     cd ../images_plugins
     rm -f *.so
+
+    setRootDir
+    rm -rf images_lib
+    rm -rf images_plugins
     
     setRootDir
     cd blok-simulator
@@ -31,10 +35,21 @@ clean () {
     make clean
 
     setRootDir
+    rm -rf simulator_lib
+    rm -rf simulator_plugins
+
+    setRootDir
     cd blok-audio
     make clean
     cd ../phononaudio
     make clean
+
+    setRootDir
+    rm -rf audio_lib
+    rm -rf audio_plugins
+
+    setRootDir
+    rm -rf blok-qt/blok
 }
 
 compileBlokImages () {
