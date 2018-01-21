@@ -13,5 +13,5 @@ SnowBackgroundImage::SnowBackgroundImage()
 
 void SnowBackgroundImage::createBackground(QGraphicsScene *scene)
 {
-    scene->addPixmap(QPixmap(":/images/background.png"))->setPos(-500, -300);
+    scene->addPixmap(QPixmap(":/images/snowbackground.png"))->setPos(-500, -300);
 }

@@ -32,6 +32,7 @@ class MediaObject;
 
 class PHONONAUDIOSHARED_EXPORT PhononAudio : public IAudio
 {
+    Q_OBJECT
     Q_INTERFACES(IAudio)
 public:
     PhononAudio();
@@ -40,6 +41,7 @@ public:
     void playClickAudio(const QString &audioPath) override;
     void playYouWonAudio(const QString &audioPath) override;
     void playYouLostAudio(const QString &audioPath) override;
+    IAudio *clone() override;
 
 protected Q_SLOTS:
     void enqueueBackgroundAudioSlot() override;
@@ -51,7 +53,5 @@ private:
     Phonon::MediaObject *m_backgroundAudio;
     QString m_backgroundAudioPath;
 };
-
-Q_EXPORT_PLUGIN2(phononaudio, PhononAudio)
 
 #endif // PHONONAUDIO_H

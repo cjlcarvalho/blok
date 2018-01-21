@@ -43,28 +43,38 @@ MainWindow *MainWindow::instance()
     return m_instance;
 }
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(ImageFactory *imageFactory,
+                       ISimulator *simulator,
+                       IAudio *audio,
+                       QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    _simulator(simulator),
+    _imageFactory(imageFactory),
+    _audio(audio),
     _timer(500)
 {
-    _pluginLoader = new PluginLoader();
+    _pluginLoader = new PluginLoader;
 
-    if (!_pluginLoader->imageFactory()) {
-        qDebug() << "Can't load image factory plugin";
-        return;
-    }
+    if (!_imageFactory && !_pluginLoader->imageFactories().empty())
+        _imageFactory = _pluginLoader->imageFactories()[0];
 
-    if (!_pluginLoader->simulator()) {
-        qDebug() << "Can't load simulator plugin";
-        return;
-    }
+    if (!_simulator && !_pluginLoader->simulators().empty())
+        _simulator = _pluginLoader->simulators()[0];
 
-    if (!_pluginLoader->audio()) {
-        qDebug() << "Can't load audio plugin";
-        return;
-    }
+    if (!_audio && !_pluginLoader->audios().empty())
+        _audio = _pluginLoader->audios()[0];
 
+    updateWindow();
+}
+
+MainWindow::~MainWindow()
+{
+    delete _audio;
+}
+
+void MainWindow::updateWindow()
+{
     qsrand(1);
     ui->setupUi(this);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
@@ -72,18 +82,32 @@ MainWindow::MainWindow(QWidget *parent) :
     _scene = new QGraphicsScene;
     _scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    _imageFactory = _pluginLoader->imageFactory();
-
     ui->graphicsView->setScene(_scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
     ui->graphicsView->setMaximumSize(1000, 600);
     ui->graphicsView->setMinimumSize(1000, 600);
     ui->graphicsView->installEventFilter(this);
 
+    QMenu *imageMenu = ui->menuBar->addMenu(tr("&Image"));
+    imageMenu->setObjectName(tr("&Image"));
+
+    QMenu *simulatorMenu = ui->menuBar->addMenu(tr("&Simulator"));
+    simulatorMenu->setObjectName(tr("&Simulator"));
+
+    QMenu *audioMenu = ui->menuBar->addMenu(tr("&Audio"));
+    audioMenu->setObjectName(tr("&Audio"));
+
     _timer.setFrameRange(0, 100);
     _animation.setTimeLine(&_timer);
 
-    _simulator = _pluginLoader->simulator();
+    connect(_pluginLoader, SIGNAL(updateImageFactories(QList<ImageFactory*>)),
+            this, SLOT(updateImageFactoriesMenu(QList<ImageFactory*>)));
+
+    connect(_pluginLoader, SIGNAL(updateSimulators(QList<ISimulator*>)),
+            this, SLOT(updateSimulatorsMenu(QList<ISimulator*>)));
+
+    connect(_pluginLoader, SIGNAL(updateAudios(QList<IAudio*>)),
+            this, SLOT(updateAudioMenu(QList<IAudio*>)));
 
     connect(_simulator, SIGNAL(bodiesCreated(QList<QPointF>)),
             SLOT(bodiesCreated(QList<QPointF>)));
@@ -123,14 +147,107 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _stateMachine.start();
 
-    _audio = _pluginLoader->audio();
-
     _audio->startBackgroundAudio("qrc:///resources/sounds/background.wav");
+
+    startMenus();
 }
 
-MainWindow::~MainWindow()
+void MainWindow::startMenus()
 {
-    delete _audio;
+    updateImageFactoriesMenu(_pluginLoader->imageFactories());
+    updateSimulatorsMenu(_pluginLoader->simulators());
+    updateAudioMenu(_pluginLoader->audios());
+}
+
+void MainWindow::updateImageFactoriesMenu(const QList<ImageFactory *> &imageFactories)
+{
+    QList<QMenu *> imageMenu = ui->menuBar->findChildren<QMenu *>(tr("&Image"));
+
+    if (imageMenu.empty())
+        return;
+
+    imageMenu[0]->clear();
+
+    for (ImageFactory *factory : imageFactories) {
+        QAction *action = new QAction(factory->metaObject()->className(), factory);
+
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(reloadWindow()));
+
+        imageMenu[0]->addAction(action);
+    }
+}
+
+void MainWindow::updateSimulatorsMenu(const QList<ISimulator *> &simulators)
+{
+    QList<QMenu *> simulatorMenu = ui->menuBar->findChildren<QMenu *>(tr("&Simulator"));
+
+    if (simulatorMenu.empty())
+        return;
+
+    simulatorMenu[0]->clear();
+
+    for (ISimulator *simulator : simulators) {
+        QAction *action = new QAction(simulator->metaObject()->className(), simulator);
+
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(reloadWindow()));
+
+        simulatorMenu[0]->addAction(action);
+    }
+}
+
+void MainWindow::updateAudioMenu(const QList<IAudio *> &audios)
+{
+    QList<QMenu *> audioMenu = ui->menuBar->findChildren<QMenu *>(tr("&Audio"));
+
+    if (audioMenu.empty())
+        return;
+
+    audioMenu[0]->clear();
+
+    for (IAudio *audio : audios) {
+        QAction *action = new QAction(audio->metaObject()->className(), audio);
+
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(reloadWindow()));
+
+        audioMenu[0]->addAction(action);
+    }
+}
+
+void MainWindow::reloadWindow()
+{
+    QAction *action = dynamic_cast<QAction *>(sender());
+
+    ImageFactory *factory = dynamic_cast<ImageFactory *>(action->parent());
+
+    if (factory) {
+        MainWindow::reload(factory, _simulator, _audio->clone());
+        return;
+    }
+
+    ISimulator *simulator = dynamic_cast<ISimulator *>(action->parent());
+
+    if (simulator) {
+        MainWindow::reload(_imageFactory, simulator, _audio->clone());
+        return;
+    }
+
+    IAudio *audio = dynamic_cast<IAudio *>(action->parent());
+
+    if (audio) {
+        MainWindow::reload(_imageFactory, _simulator, audio);
+        return;
+    }
+}
+
+void MainWindow::reload(ImageFactory *imageFactory, ISimulator *simulator, IAudio *audio)
+{
+    MainWindow *copyInstance = new MainWindow(imageFactory, simulator, audio);
+
+    delete m_instance;
+
+    copyInstance->show();
+
+    m_instance = copyInstance;
 }
 
 void MainWindow::init()

@@ -26,14 +26,13 @@
 
 class BLOKAUDIOSHARED_EXPORT IAudio : public QObject
 {
-    Q_OBJECT
-
 public:
     virtual ~IAudio() = 0;
     virtual void startBackgroundAudio(const QString &audioPath) = 0;
     virtual void playClickAudio(const QString &audioPath) = 0;
     virtual void playYouWonAudio(const QString &audioPath) = 0;
     virtual void playYouLostAudio(const QString &audioPath) = 0;
+    virtual IAudio *clone() = 0;
 
 protected Q_SLOTS:
     virtual void enqueueBackgroundAudioSlot() = 0;

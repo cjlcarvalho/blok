@@ -10,5 +10,5 @@ StarWarsBackgroundImage::StarWarsBackgroundImage()
 
 void StarWarsBackgroundImage::createBackground(QGraphicsScene *scene)
 {
-    scene->addPixmap(QPixmap(":/images/background.png"))->setPos(-500, -300);
+    scene->addPixmap(QPixmap(":/images/starwarsbackground.png"))->setPos(-500, -300);
 }

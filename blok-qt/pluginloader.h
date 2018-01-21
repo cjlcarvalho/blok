@@ -20,28 +20,41 @@
 #ifndef PLUGINLOADER_H
 #define PLUGINLOADER_H
 
+#include <QDir>
+#include <QList>
 #include <QObject>
 
 class ImageFactory;
 class ISimulator;
 class IAudio;
 
-class PluginLoader
+class PluginLoader : public QObject
 {
+    Q_OBJECT
+
 public:
     PluginLoader();
     void update();
-    ImageFactory *imageFactory() const;
-    ISimulator *simulator() const;
-    IAudio *audio() const;
+    QList<ImageFactory *> imageFactories() const;
+    QList<ISimulator *> simulators() const;
+    QList<IAudio *> audios() const;
+
+Q_SIGNALS:
+    void updateImageFactories(const QList<ImageFactory *> &imageFactories);
+    void updateSimulators(const QList<ISimulator *> &simulators);
+    void updateAudios(const QList<IAudio *> &audios);
+
+public Q_SLOTS:
+    void updatePlugins(const QString &pluginDirPath);
 
 protected:
-    QObject *retrievePlugin(QString pluginDirPath);
+    QList<QObject *> retrievePlugin(const QString &pluginDirPath);
+    QDir retrievePluginDir(const QString &pluginFile);
 
 private:
-    ImageFactory *m_imageFactory;
-    ISimulator *m_simulator;
-    IAudio *m_audio;
+    QList<ImageFactory *> m_imageFactories;
+    QList<ISimulator *> m_simulators;
+    QList<IAudio *> m_audios;
 };
 
 #endif // PLUGINLOADER_H

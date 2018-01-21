@@ -64,11 +64,25 @@ private Q_SLOTS:
     void setBannerMessage(const QString &bannerMessage);
     void youWon();
     void youLost();
+    void updateImageFactoriesMenu(const QList<ImageFactory *> &imageFactories);
+    void updateSimulatorsMenu(const QList<ISimulator *> &simulators);
+    void updateAudioMenu(const QList<IAudio *> &audios);
+    void reloadWindow();
 
 protected:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(ImageFactory *imageFactory = 0,
+                        ISimulator *simulator = 0,
+                        IAudio *audio = 0,
+                        QWidget *parent = 0);
     ~MainWindow();
     bool eventFilter(QObject *obj, QEvent *event);
+
+private:
+    static void reload(ImageFactory *imageFactory,
+                       ISimulator *simulator,
+                       IAudio *audio);
+    void updateWindow();
+    void startMenus();
 
 private:
     static MainWindow *m_instance;

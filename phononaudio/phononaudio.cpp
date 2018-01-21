@@ -34,6 +34,13 @@ PhononAudio::~PhononAudio()
     delete m_backgroundAudio;
 }
 
+IAudio *PhononAudio::clone()
+{
+    PhononAudio *copyAudio = new PhononAudio();
+    copyAudio->m_backgroundAudioPath = m_backgroundAudioPath;
+    return copyAudio;
+}
+
 void PhononAudio::startBackgroundAudio(const QString &audioPath)
 {
     m_backgroundAudioPath = audioPath;
@@ -76,3 +83,5 @@ void PhononAudio::enqueueBackgroundAudioSlot()
 {
     m_backgroundAudio->enqueue(Phonon::MediaSource(QUrl(m_backgroundAudioPath)));
 }
+
+Q_EXPORT_PLUGIN2(phononaudio, PhononAudio)

@@ -1,16 +1,16 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/background.png</file>
-        <file>images/brick.png</file>
-        <file>images/ground.png</file>
-        <file>images/player0.png</file>
-        <file>images/player1.png</file>
-        <file>images/player2.png</file>
-        <file>images/player3.png</file>
-        <file>images/player4.png</file>
-        <file>images/player5.png</file>
-        <file>images/player6.png</file>
-        <file>images/player7.png</file>
-        <file>images/player8.png</file>
+        <file>images/starwarsbackground.png</file>
+        <file>images/starwarsbrick.png</file>
+        <file>images/starwarsground.png</file>
+        <file>images/starwarsplayer0.png</file>
+        <file>images/starwarsplayer1.png</file>
+        <file>images/starwarsplayer2.png</file>
+        <file>images/starwarsplayer3.png</file>
+        <file>images/starwarsplayer4.png</file>
+        <file>images/starwarsplayer5.png</file>
+        <file>images/starwarsplayer6.png</file>
+        <file>images/starwarsplayer7.png</file>
+        <file>images/starwarsplayer8.png</file>
     </qresource>
 </RCC>

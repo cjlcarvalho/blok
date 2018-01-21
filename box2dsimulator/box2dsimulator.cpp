@@ -164,3 +164,5 @@ void Box2DSimulator::removeBody(const QPointF &body)
         }
     }
 }
+
+Q_EXPORT_PLUGIN2(box2dsimulator, Box2DSimulator)

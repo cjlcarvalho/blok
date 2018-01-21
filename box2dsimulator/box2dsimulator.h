@@ -36,6 +36,9 @@ class b2Body;
 
 class BOX2DSIMULATORSHARED_EXPORT Box2DSimulator : public ISimulator, public b2ContactListener
 {
+    Q_OBJECT
+    Q_INTERFACES(ISimulator)
+
 public:
     explicit Box2DSimulator(QObject *parent = 0);
     virtual ~Box2DSimulator();
@@ -63,7 +66,5 @@ private:
 
     QString _playerString;
 };
-
-Q_EXPORT_PLUGIN2(box2dsimulator, Box2DSimulator)
 
 #endif // BOX2DSIMULATOR_H

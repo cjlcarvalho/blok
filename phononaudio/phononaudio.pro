@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+greaterThan(QT_MAJOR_VERSION, 4): QT       -= gui
 
 TARGET = phononaudio
 TEMPLATE = lib

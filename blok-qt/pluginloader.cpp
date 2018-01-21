@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QFileSystemWatcher>
 #include <QPluginLoader>
 
 #include "../blok-images/imagefactory.h"
@@ -28,30 +29,77 @@
 
 #include "pluginloader.h"
 
-PluginLoader::PluginLoader() :
-    m_imageFactory(nullptr),
-    m_simulator(nullptr),
-    m_audio(nullptr)
+PluginLoader::PluginLoader()
 {
     update();
+
+    QFileSystemWatcher *watcher = new QFileSystemWatcher;
+
+    watcher->addPaths({ retrievePluginDir("images_plugins/").absolutePath(),
+                        retrievePluginDir("simulator_plugins/").absolutePath(),
+                        retrievePluginDir("audio_plugins/").absolutePath() });
+
+    connect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(updatePlugins(QString)));
 }
 
 void PluginLoader::update()
 {
-    QObject *imagePlugin = retrievePlugin("images_plugins/");
-    if (imagePlugin)
-        m_imageFactory = dynamic_cast<ImageFactory *>(imagePlugin);
+    QList<QObject *> imagesPlugins = retrievePlugin("images_plugins/");
 
-    QObject *simulatorPlugin = retrievePlugin("simulator_plugins/");
-    if (simulatorPlugin)
-        m_simulator = dynamic_cast<ISimulator *>(simulatorPlugin);
+    m_imageFactories.clear();
 
-    QObject *audioPlugin = retrievePlugin("audio_plugins/");
-    if (audioPlugin)
-        m_audio = dynamic_cast<IAudio *>(audioPlugin);
+    for (QObject *item : imagesPlugins)
+        m_imageFactories.append(dynamic_cast<ImageFactory *>(item));
+
+    QList<QObject *> simulatorPlugins = retrievePlugin("simulator_plugins/");
+
+    m_simulators.clear();
+
+    for (QObject *item : simulatorPlugins)
+        m_simulators.append(dynamic_cast<ISimulator *>(item));
+
+    QList<QObject *> audioPlugins = retrievePlugin("audio_plugins/");
+
+    m_audios.clear();
+
+    for (QObject *item : audioPlugins)
+        m_audios.append(dynamic_cast<IAudio *>(item));
 }
 
-QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
+void PluginLoader::updatePlugins(const QString &pluginDirPath)
+{
+    QList<QObject *> plugins = retrievePlugin(pluginDirPath);
+
+    if (pluginDirPath == retrievePluginDir("images_plugins/").absolutePath())
+    {
+        m_imageFactories.clear();
+
+        for (QObject *item : plugins)
+            m_imageFactories.append(qobject_cast<ImageFactory *>(item));
+
+        emit updateImageFactories(m_imageFactories);
+    }
+    else if (pluginDirPath == retrievePluginDir("simulator_plugins/").absolutePath())
+    {
+        m_simulators.clear();
+
+        for (QObject *item : plugins)
+            m_simulators.append(dynamic_cast<ISimulator *>(item));
+
+        emit updateSimulators(m_simulators);
+    }
+    else if (pluginDirPath == retrievePluginDir("audio_plugins/").absolutePath())
+    {
+        m_audios.clear();
+
+        for (QObject *item : plugins)
+            m_audios.append(dynamic_cast<IAudio *>(item));
+
+        emit updateAudios(m_audios);
+    }
+}
+
+QDir PluginLoader::retrievePluginDir(const QString &pluginFile)
 {
     QDir pluginsDir = QDir(QCoreApplication::applicationDirPath());
 
@@ -67,7 +115,16 @@ QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
 #endif
 
     pluginsDir.cdUp();
-    pluginsDir.cd(pluginDirPath);
+    pluginsDir.cd(pluginFile);
+
+    return pluginsDir;
+}
+
+QList<QObject *> PluginLoader::retrievePlugin(const QString &pluginDirPath)
+{
+    QDir pluginsDir = retrievePluginDir(pluginDirPath);
+
+    QList<QObject *> resultList;
 
     for (const QString &file : pluginsDir.entryList(QDir::Files)) {
         if (!QLibrary::isLibrary(pluginsDir.absoluteFilePath(file)))
@@ -76,23 +133,23 @@ QObject *PluginLoader::retrievePlugin(QString pluginDirPath)
         qDebug() << "Arquivo: " << pluginsDir.absoluteFilePath(file);
         QPluginLoader loader(pluginsDir.absoluteFilePath(file));
 
-        return loader.instance();
+        resultList.append(loader.instance());
     }
 
-    return nullptr;
+    return resultList;
 }
 
-ImageFactory *PluginLoader::imageFactory() const
+QList<ImageFactory *> PluginLoader::imageFactories() const
 {
-    return m_imageFactory;
+    return m_imageFactories;
 }
 
-ISimulator *PluginLoader::simulator() const
+QList<ISimulator *> PluginLoader::simulators() const
 {
-    return m_simulator;
+    return m_simulators;
 }
 
-IAudio *PluginLoader::audio() const
+QList<IAudio *> PluginLoader::audios() const
 {
-    return m_audio;
+    return m_audios;
 }
