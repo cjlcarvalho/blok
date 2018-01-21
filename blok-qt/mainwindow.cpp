@@ -23,8 +23,6 @@
 #include <QtCore/QTimer>
 #include <QtCore/QDebug>
 
-#include <QtGui/QSound>
-#include <QtGui/QBrush>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QGraphicsPixmapItem>
 #include <QtGui/QGraphicsItemAnimation>
