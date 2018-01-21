@@ -67,4 +67,6 @@ private:
     QString _playerString;
 };
 
+Q_EXPORT_PLUGIN2(box2dsimulator, Box2DSimulator)
+
 #endif // BOX2DSIMULATOR_H
