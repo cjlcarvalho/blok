@@ -50,14 +50,29 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     _timer(500)
 {
+    _pluginLoader = new PluginLoader();
+
+    if (!_pluginLoader->imageFactory()) {
+        qDebug() << "Can't load image factory plugin";
+        return;
+    }
+
+    if (!_pluginLoader->simulator()) {
+        qDebug() << "Can't load simulator plugin";
+        return;
+    }
+
+    if (!_pluginLoader->audio()) {
+        qDebug() << "Can't load audio plugin";
+        return;
+    }
+
     qsrand(1);
     ui->setupUi(this);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     _scene = new QGraphicsScene;
     _scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-
-    _pluginLoader = new PluginLoader();
 
     _imageFactory = _pluginLoader->imageFactory();
 

@@ -28,7 +28,15 @@
 
 #include "pluginloader.h"
 
-PluginLoader::PluginLoader()
+PluginLoader::PluginLoader() :
+    m_imageFactory(nullptr),
+    m_simulator(nullptr),
+    m_audio(nullptr)
+{
+    update();
+}
+
+void PluginLoader::update()
 {
     QObject *imagePlugin = retrievePlugin("images_plugins/");
     if (imagePlugin)

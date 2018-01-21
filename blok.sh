@@ -49,6 +49,9 @@ clean () {
     rm -rf audio_plugins
 
     setRootDir
+    rm -rf build-*
+
+    setRootDir
     rm -rf blok-qt/blok
 }
 

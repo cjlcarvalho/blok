@@ -30,6 +30,7 @@ class PluginLoader
 {
 public:
     PluginLoader();
+    void update();
     ImageFactory *imageFactory() const;
     ISimulator *simulator() const;
     IAudio *audio() const;

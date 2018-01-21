@@ -24,9 +24,6 @@
 #include <QtPlugin>
 
 #include <QtCore/QList>
-#include <QtCore/QObject>
-
-#include <QtCore/QSharedPointer>
 
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 
