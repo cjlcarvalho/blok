@@ -85,6 +85,8 @@ void MainWindow::updateWindow()
     ui->setupUi(this);
     layout()->setSizeConstraint(QLayout::SetFixedSize);
 
+    setWindowTitle("Blok");
+
     _scene = new QGraphicsScene;
     _scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
