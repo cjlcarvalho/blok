@@ -76,10 +76,7 @@ MainWindow::MainWindow(ImageFactory *imageFactory,
 
 MainWindow::~MainWindow()
 {
-    delete _imageFactory;
-    delete _simulator;
     delete _audio;
-    delete _pluginLoader;
 }
 
 void MainWindow::updateWindow()
